@@ -17,6 +17,7 @@ import {
     ScanOutlined
 } from '@ant-design/icons';
 import { Menu, message } from 'antd';
+import api from "../..";
 
 // Helper function to create a relative link item
 const getItem = (label, link, icon, key) => ({
@@ -42,7 +43,9 @@ export default function MenuBar() {
         const fetchData = async () => {
             try {
                 console.log("requesting status")
-                const response = await axios.get(window.APIROOT + 'api/data/status', { withCredentials: true });
+                // const response = await axios.get(window.APIROOT + 'api/data/status', { withCredentials: true });
+                const response = await api.get('api/data/status');
+
                 console.log(response)
                 setStatus(response.data);
             } catch (error) {

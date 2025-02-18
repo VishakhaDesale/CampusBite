@@ -3,6 +3,7 @@ import { Button, Space, message } from 'antd';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import WeekMenu from '../../components/WeekMenu';
+import api from '../..';
 
 export default function TotalMealsPage() {
     const [thisweek, setthisweek] = useState(true);
@@ -13,7 +14,9 @@ export default function TotalMealsPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await axios.post(window.APIROOT + 'api/admin/meals', { week: thisweek ? "this" : "next" });
+                // const response = await axios.post(window.APIROOT + 'api/admin/meals', { week: thisweek ? "this" : "next" });
+                const response = await api.post('api/admin/meals', { week: thisweek ? "this" : "next" });
+
                 setMenu(response.data);
                 console.log(response.data);
                 setLoading(false);

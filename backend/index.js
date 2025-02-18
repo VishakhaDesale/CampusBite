@@ -28,25 +28,12 @@ mongoose.connect(process.env.MONGO_URI, {
 // Passport config
 require('./config/passport')(passport);
 
-// Middleware
-// app.use(cors({ credentials: true }));
-// app.use(cors({
-//     origin: process.env.FRONTEND || 'http://localhost:3000',
-//     credentials: true,
-//     allowedHeaders: ['Content-Type', 'Authorization']
-// }));
 
 app.use(cors({
     origin: process.env.FRONTEND || 'http://localhost:3000',
     credentials: true,
     exposedHeaders: ['set-cookie'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: [
-        'Content-Type', 
-        'Authorization', 
-        'X-Requested-With',
-        'Accept'
-    ]
 }));
 
 app.use(express.json());
@@ -64,17 +51,20 @@ app.use((req, res, next) => {
 app.use(
     session({
         secret: process.env.SECRET || 'Mess_Portal',
-        resave: true,
+        resave: false,
         saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI,
-            ttl: 14 * 24 * 60 * 60
+            ttl: 14 * 24 * 60 * 60, // 14 days
+            autoRemove: 'interval',
+            autoRemoveInterval: 10 // Minutes
         }),
         cookie: {
             maxAge: 1000 * 60 * 60 * 24, // 1 day session duration
             secure: false, // Use `true` for HTTPS
             httpOnly: true,
-            sameSite: 'lax'
+            sameSite: 'lax',
+            path: '/'
         }
     })
 );
@@ -82,12 +72,15 @@ app.use(
 
 // Add passport session persistence middleware
 app.use((req, res, next) => {
-    if (req.session && req.user) {
-        // Refresh session expiration on activity
-        req.session.touch();
-        req.session.save();
+    if (req.session && !req.session.regenerate) {
+        req.session.regenerate = true;
+        req.session.save(err => {
+            if (err) console.error('Session save error:', err);
+            next();
+        });
+    } else {
+        next();
     }
-    next();
 });
 
 

@@ -4,6 +4,7 @@ import { SaveOutlined } from '@ant-design/icons'
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import api from '../..';
 
 function WeekMenu(menu, setMenu) {
     return menu.map(e =>
@@ -139,7 +140,9 @@ export default function AdminPanel() {
 
     const fetchTime = async () => {
         try {
-            let response = await axios.get(window.APIROOT + 'api/data/time');
+            // let response = await axios.get(window.APIROOT + 'api/data/time');
+            let response = await api.get('api/data/time');
+            
             setTimingRow(response.data);
             console.log(response.data);
         } catch (error) {
@@ -150,7 +153,9 @@ export default function AdminPanel() {
     const setTime = async () => {
         setSavingTime(true);
         try {
-            await axios.post(window.APIROOT + 'api/admin/setTime', { times: timingRow });
+            // await axios.post(window.APIROOT + 'api/admin/setTime', { times: timingRow });
+            await api.post('api/admin/setTime', { times: timingRow });
+
             message.success('Changes saved successfully')
         } catch (error) {
             message.error('Failed to save changes');
@@ -170,7 +175,9 @@ export default function AdminPanel() {
 
     const fetchMenu = async () => {
         try {
-            const response = await axios.get(window.APIROOT + 'api/data/menu');
+            // const response = await axios.get(window.APIROOT + 'api/data/menu');
+            const response = await api.get('api/data/menu');
+            
             setMenu(response.data);
         } catch (error) {
             message.error('Failed to fetch menu from server');
@@ -180,7 +187,9 @@ export default function AdminPanel() {
     const saveMenu = async () => {
         setSavingMenu(true);
         try {
-            await axios.post(window.APIROOT + 'api/admin/setMenu', { menus: menu });
+            // await axios.post(window.APIROOT + 'api/admin/setMenu', { menus: menu });
+            await api.post('api/admin/setMenu', { menus: menu });
+            
             message.success('Changes saved successfully')
         } catch (error) {
             message.error('Failed to save changes');

@@ -4,6 +4,7 @@ import { ShoppingCartOutlined } from '@ant-design/icons';
 import { useState, useEffect, useCallback } from 'react';
 import axios from "axios";
 import useRazorpay from "react-razorpay";
+import api from '../..';
 
 const dayToNum = { "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6 };
 
@@ -25,12 +26,16 @@ const columns = [
 ];
 
 async function createOrder(selected) {
-    let response = await axios.post(window.APIROOT + 'api/user/createOrder', { selected: selected });
+    // let response = await axios.post(window.APIROOT + 'api/user/createOrder', { selected: selected });
+    let response = await api.post('api/user/createOrder', { selected: selected });
+
     return response.data;
 }
 
 async function CheckOrder(resp, setBought) {
-    let response = await axios.post(window.APIROOT + 'api/user/checkOrder', resp);
+    // let response = await axios.post(window.APIROOT + 'api/user/checkOrder', resp);
+    let response = await api.post('api/user/checkOrder', resp);
+    
     if (response.data) {
         message.success("Coupons bought!");
         setBought(true);
@@ -138,8 +143,12 @@ export default function BuyPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let response = await axios.get(window.APIROOT + 'api/data/menu');
-                let cost = await axios.get(window.APIROOT + 'api/data/time');
+                // let response = await axios.get(window.APIROOT + 'api/data/menu');
+                let response = await api.get('api/data/menu');
+
+                // let cost = await axios.get(window.APIROOT + 'api/data/time');
+                let cost = await api.get('api/data/time');
+                
                 let data = {};
                 for (let c of cost.data) data[c.meal] = c.cost;
                 for (let i = 0; i < response.data.length; i++) {
@@ -160,7 +169,9 @@ export default function BuyPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let response = await axios.get(window.APIROOT + 'api/user/boughtNextWeek');
+                // let response = await axios.get(window.APIROOT + 'api/user/boughtNextWeek');
+                let response = await api.get('api/user/boughtNextWeek');
+
                 setBought(response.data);
             } catch (error) {
                 message.error('Failed to fetch data from server');

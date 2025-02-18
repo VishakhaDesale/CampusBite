@@ -4,6 +4,7 @@ import { ReloadOutlined, QuestionOutlined, LoadingOutlined } from '@ant-design/i
 import { Button, notification, Space, message } from 'antd';
 import axios from "axios";
 import { useState, useEffect } from "react";
+import api from '../..';
 
 export default function QRCodePage() {
     const [loading, setLoading] = useState(false);
@@ -13,7 +14,9 @@ export default function QRCodePage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(window.APIROOT + 'api/user/data');
+                // const response = await axios.get(window.APIROOT + 'api/user/data');
+                const response = await api.get('api/user/data');
+
                 const code = response.data.secret + response.data.email;
                 setRawCode(code);
                 setLoading(false);
@@ -35,7 +38,9 @@ export default function QRCodePage() {
                     onClick={async () => {
                         setLoading(true);
                         try {
-                            const response = await axios.get(window.APIROOT + 'api/user/resetSecret');
+                            // const response = await axios.get(window.APIROOT + 'api/user/resetSecret');
+                            const response = await api.get('api/user/resetSecret');
+
                             const code = response.data.secret + response.data.email;
                             setRawCode(code);
                             setLoading(false);

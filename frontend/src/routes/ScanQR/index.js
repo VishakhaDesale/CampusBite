@@ -6,6 +6,7 @@ import Fade from '../../utility/fade';
 import { CloseSquareOutlined, CheckSquareOutlined, ReloadOutlined, LoadingOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import api from '../..';
 
 export default function ScanQRPage() {
     const [data, setData] = useState();
@@ -14,7 +15,9 @@ export default function ScanQRPage() {
 
     const checkCoupon = async (postData) => {
         try {
-            const response = await axios.post(window.APIROOT + 'api/user/checkCoupon', postData);
+            // const response = await axios.post(window.APIROOT + 'api/user/checkCoupon', postData);
+            const response = await api.post('api/user/checkCoupon', postData);
+
             setValid(response.data);
         } catch (error) {
             message.error("Failed to reach server to verify coupon");

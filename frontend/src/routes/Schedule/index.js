@@ -5,6 +5,7 @@ import WeekMenu from '../../components/WeekMenu';
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import api from '../..';
 
 const timingCol = [
     {
@@ -33,7 +34,9 @@ export default function SchedulePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let response = await axios.get(window.APIROOT + 'api/data/time');
+                // let response = await axios.get(window.APIROOT + 'api/data/time');
+                let response = await api.get('api/data/time');
+
                 console.log("time:", response);
                 setTimingRow(response.data);
             } catch (error) {
@@ -46,7 +49,9 @@ export default function SchedulePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(window.APIROOT + 'api/data/menu');
+                // const response = await axios.get(window.APIROOT + 'api/data/menu');
+                const response = await api.get('api/data/menu');
+
                 console.log("menu:", response);
                 setMenu(response.data);
             } catch (error) {

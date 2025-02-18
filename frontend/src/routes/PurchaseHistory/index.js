@@ -4,6 +4,7 @@ import { useMediaQuery } from 'react-responsive';
 import WeekMenu from '../../components/WeekMenu';
 import axios from "axios";
 import { useState, useEffect } from "react";
+import api from '../..';
 
 export default function PurchaseHistoryPage() {
     const mobile = useMediaQuery({ query: '(max-width: 750px)' });
@@ -15,8 +16,12 @@ export default function PurchaseHistoryPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await axios.get(window.APIROOT + 'api/data/menu');
-                const buyer = await axios.get(window.APIROOT + 'api/user/data');
+                // const response = await axios.get(window.APIROOT + 'api/data/menu');
+                const response = await api.get('api/data/menu');
+
+                // const buyer = await axios.get(window.APIROOT + 'api/user/data');
+                const buyer = await api.get('api/user/data');
+                
                 let data = [];
                 for (let r of response.data) {
                     data.push({
