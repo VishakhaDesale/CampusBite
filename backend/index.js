@@ -60,21 +60,7 @@ app.use((req, res, next) => {
   });
 
 // Session management
-console.log("s1",    session({
-    secret: process.env.SECRET || 'Mess_Portal',
-    resave: true,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI,
-        ttl: 14 * 24 * 60 * 60
-    }),
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 1 day session duration
-        secure: false, // Use `true` for HTTPS
-        httpOnly: true,
-        sameSite: 'lax'
-    }
-}))
+
 app.use(
     session({
         secret: process.env.SECRET || 'Mess_Portal',
@@ -93,43 +79,6 @@ app.use(
     })
 );
 
-console.log("s2",    session({
-    secret: process.env.SECRET || 'Mess_Portal',
-    resave: true,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI,
-        ttl: 14 * 24 * 60 * 60
-    }),
-    cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 1 day session duration
-        secure: false, // Use `true` for HTTPS
-        httpOnly: true,
-        sameSite: 'lax'
-    }
-}))
-
-// Update session configuration
-// app.use(
-//     session({
-//         secret: process.env.SECRET || 'Mess_Portal',
-//         resave: false, // Changed from true
-//         saveUninitialized: false,
-//         store: MongoStore.create({
-//             mongoUrl: process.env.MONGO_URI,
-//             ttl: 14 * 24 * 60 * 60,
-//             autoRemove: 'interval',
-//             autoRemoveInterval: 60 // Minutes
-//         }),
-//         cookie: {
-//             maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-//             secure: process.env.NODE_ENV === 'production',
-//             httpOnly: true,
-//             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-//             domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : 'localhost'
-//         }
-//     })
-// );
 
 // Add passport session persistence middleware
 app.use((req, res, next) => {
@@ -152,19 +101,6 @@ app.use((req, res, next) => {
     console.log('Session ID:', req.sessionID);
     console.log('Authenticated:', req.isAuthenticated());
     console.log('User:', req.user);
-    next();
-});
-
-
-
-// Add before your routes
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api') && !req.path.includes('/auth')) {
-        if (!req.sessionID) {
-            console.warn('Missing session for API request:', req.path);
-            return res.status(401).json({ error: 'Session required' });
-        }
-    }
     next();
 });
 
