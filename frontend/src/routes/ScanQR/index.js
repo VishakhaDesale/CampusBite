@@ -26,6 +26,17 @@ export default function ScanQRPage() {
     }
 
     useEffect(() => {
+        // Dummy Coupon
+        const pdata = {
+            secret: "QPcj",  // 4-character secret matching user's record
+            email: "lufyzoro2003@gmail.com",
+            day: "monday",   // Current day in lowercase
+            type: "breakfast"
+          }
+        const response =  api.post('api/user/checkCoupon', pdata);
+        console.log("Coupon:", response);
+
+
         if (!data) return;
         const secret = data?.substring(0, 4);
         const email = data?.substring(4, data.length);

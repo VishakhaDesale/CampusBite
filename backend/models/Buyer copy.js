@@ -189,7 +189,6 @@ module.exports.resetSecret = async function (email) {
 
 // Check if the user's coupon is valid for the current day and meal
 module.exports.checkCoupon = async function (data) {
-    console.log("Coupon is here!!", data);
     const Buyer = await BuyerSchema.findOne({ email: data.email, secret: data.secret });
     if (Buyer == null) return false;
     if (Buyer.this[data.day][data.type]) {
@@ -200,33 +199,14 @@ module.exports.checkCoupon = async function (data) {
 }
 
 // Save the purchased coupons after a successful payment
-// module.exports.saveOrder = async function (email, data) {
-//     console.log("saveorder:", data)
-//     await BuyerSchema.updateOne({ email: email }, { next: data, bought: true });
-    
-// }
-
-// Save the purchased coupons after a successful payment
-module.exports.saveOrder = async function (email, selectedMeals) {
-    console.log("SelectedMeals:", selectedMeals)
-    await BuyerSchema.updateOne(
-        { email: email },
-        { 
-            $set: { 
-                "next": selectedMeals,
-                bought: true 
-            }
-        },
-        { upsert: true }
-    );
+module.exports.saveOrder = async function (email, data) {
+    await BuyerSchema.updateOne({ email: email }, { next: data, bought: true });
 }
 
 // Check if the user has already bought the coupons for the coming week
 module.exports.boughtNextWeek = async function (email) {
     await module.exports.getBuyer(email);
-
     const Buyer = await BuyerSchema.findOne({ email: email });
-
     return Buyer.bought;
 }
 

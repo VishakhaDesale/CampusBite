@@ -21,19 +21,6 @@ router.get(
     )
 );
 
-// Signout button link
-// router.get(
-//     "/signout",
-//     (req, res, next) => {
-//         console.log("Google sign-out route was called");  // Debugging log
-//         next();  // Proceed with authentication
-//     },
-//     (req, res) => {
-//         req.logout();
-//         res.redirect(process.env.FRONTEND);
-//     }
-// );
-
 router.get(
     "/signout",
     (req, res, next) => {
@@ -50,18 +37,6 @@ router.get(
 );
 
 
-// For google redirection handling
-// router.get(
-//     "/google/callback",
-//     (req, res, next) => {
-//         console.log("Google callback route was called");  // Debugging log
-//         next();  // Proceed with authentication
-//     },
-//     passport.authenticate("google", { failureRedirect: process.env.FRONTEND }),
-//     (req, res) => {
-//         res.redirect(process.env.FRONTEND);
-//     }
-// );
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: process.env.FRONTEND }),
     (req, res) => {
         // Call req.login() to establish a session
