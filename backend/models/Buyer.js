@@ -189,13 +189,17 @@ module.exports.resetSecret = async function (email) {
 
 // Check if the user's coupon is valid for the current day and meal
 module.exports.checkCoupon = async function (data) {
-    console.log("Coupon is here!!", data);
+    console.log("Coupon is here!!", data.email);
     const Buyer = await BuyerSchema.findOne({ email: data.email, secret: data.secret });
+    console.log("Coupon is here Buyer!!", Buyer);
+
     if (Buyer == null) return false;
     if (Buyer.this[data.day][data.type]) {
         await BuyerSchema.updateOne({ email: data.email }, { ["this." + data.day + "." + data.type]: false });
+        console.log("true")
         return true;
     }
+    console.log("false")
     return false;
 }
 
@@ -213,7 +217,7 @@ module.exports.saveOrder = async function (email, selectedMeals) {
         { email: email },
         { 
             $set: { 
-                "next": selectedMeals,
+                "this": selectedMeals,
                 bought: true 
             }
         },

@@ -116,7 +116,6 @@ router.post("/createOrder", async (req, res) => {
       return res.status(400).json({ error: "Invalid request" });
     }
 
-    console.log(req.body)
     console.log("order:")
     console.log(req.body.selected)
 

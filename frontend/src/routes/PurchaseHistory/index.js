@@ -55,21 +55,21 @@ export default function PurchaseHistoryPage() {
             <div className={classes.buttons}>
                 <Space>
                     <Button 
-                        disabled={thisweek} 
+                        disabled={!thisweek} 
                         type='primary' 
                         size='large' 
                         onClick={() => setThisWeek(true)}
                     >
                         This Week
                     </Button>
-                    <Button 
+                    {/* <Button 
                         disabled={!thisweek} 
                         type='primary' 
                         size='large' 
                         onClick={() => setThisWeek(false)}
                     >
                         Next Week
-                    </Button>
+                    </Button> */}
                 </Space>
             </div>
             <h1>{thisweek ? "Your Coupons This Week" : "Your Coupons Next Week"}</h1>
