@@ -1,13 +1,5 @@
 const mongoose = require("mongoose");
 
-// const OrderSchema = mongoose.model(
-//   "order",
-//   new mongoose.Schema({
-//     orderid: String,
-//     selected: Object,
-//   })
-// );
-
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,

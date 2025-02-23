@@ -53,60 +53,6 @@ router.post("/checkOrder", async (req, res) => {
   res.send(isValid);
 });
 
-// // Create a RazorPay order and send the order id to frontend
-// router.post(
-//     "/createOrder",
-//     async (req, res) => {
-//         let costs = await Time.getTimes();
-//         let data = {};
-//         for (let c of costs) data[c.meal] = c.cost;
-//         let total = 0;
-//         for (const [day, val] of Object.entries(req.body.selected)) {
-//             if (val.breakfast === true) total += data.breakfast;
-//             if (val.lunch === true) total += data.lunch;
-//             if (val.dinner === true) total += data.dinner;
-//         }
-
-//         let instance = new Razorpay({ key_id: process.env.PAY_ID, key_secret: process.env.PAY_SECRET });
-//         let resp = await instance.orders.create({
-//             amount: total * 100,
-//             currency: "INR"
-//         });
-//         await Order.saveOrder(resp.id, req.body.selected);
-//         res.send(resp);
-//     }
-// );
-
-// Replace payment verification with direct order acceptance
-// router.post("/createOrder", async (req, res) => {
-//     try {
-//         // Validate request
-//         if (!req.user || !req.body.selected) {
-//             return res.status(400).json({ error: 'Invalid request' });
-//         }
-
-//         // Create order directly
-//         const order = await Order.create({
-//             user: req.user._id,
-//             selected: req.body.selected,
-//             status: 'completed' // Mark as paid
-//         });
-
-//         // Update buyer's purchase history
-//         await Buyer.findOneAndUpdate(
-//             { email: req.user.email },
-//             { $push: { purchases: order._id } }
-//         );
-
-//         res.status(201).json({
-//             message: 'Order created successfully',
-//             orderId: order._id
-//         });
-//     } catch (error) {
-//         console.error('Order creation error:', error);
-//         res.status(500).json({ error: 'Failed to create order' });
-//     }
-// });
 // Example usage in route handler
 router.post("/createOrder", async (req, res) => {
   try {

@@ -203,12 +203,6 @@ module.exports.checkCoupon = async function (data) {
     return false;
 }
 
-// Save the purchased coupons after a successful payment
-// module.exports.saveOrder = async function (email, data) {
-//     console.log("saveorder:", data)
-//     await BuyerSchema.updateOne({ email: email }, { next: data, bought: true });
-    
-// }
 
 // Save the purchased coupons after a successful payment
 module.exports.saveOrder = async function (email, selectedMeals) {
