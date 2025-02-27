@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "67c0d39e507d65a82cc0df8c"
+  },
+  "meal": "breakfast",
+  "time": "08:00 AM",
+  "cost": 50
+},
+{
+  "_id": {
+    "$oid": "67c0d39e507d65a82cc0df8d"
+  },
+  "meal": "lunch",
+  "time": "01:00 PM",
+  "cost": 80
+},
+{
+  "_id": {
+    "$oid": "67c0d39e507d65a82cc0df8e"
+  },
+  "meal": "dinner",
+  "time": "08:00 PM",
+  "cost": 70
+}]

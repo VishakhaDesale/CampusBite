@@ -1,0 +1,27 @@
+[{
+  "_id": {
+    "$oid": "67c0d41c507d65a82cc0df99"
+  },
+  "day": "monday",
+  "breakfast": "Poha, Tea",
+  "lunch": "Rice, Dal, Sabzi, Salad",
+  "dinner": "Roti, Paneer, Rice"
+},
+{
+  "_id": {
+    "$oid": "67c0d41c507d65a82cc0df9a"
+  },
+  "day": "tuesday",
+  "breakfast": "Upma, Coffee",
+  "lunch": "Jeera Rice, Rajma, Salad",
+  "dinner": "Paratha, Curd, Rice"
+},
+{
+  "_id": {
+    "$oid": "67c0d41c507d65a82cc0df9b"
+  },
+  "day": "wednesday",
+  "breakfast": "Idli, Sambar",
+  "lunch": "Biryani, Raita",
+  "dinner": "Noodles, Manchurian"
+}]
