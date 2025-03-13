@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import classes from './index.module.css';
 import { Table, Button, message, Card } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
@@ -114,16 +115,16 @@ export default function BuyPage() {
             .catch(() => message.error('Failed to check existing orders'));
     }, []);
 
-    if (bought) {
-        return (
-            <div className={classes.bought}>
-                <Card title="Order Confirmed" bordered={false} style={{ width: 300 }}>
-                    Your meals for the next week have been successfully booked.
-                    You can view your purchase history for details.
-                </Card>
-            </div>
-        );
-    }
+    // if (bought) {
+    //     return (
+    //         <div className={classes.bought}>
+    //             <Card title="Order Confirmed" bordered={false} style={{ width: 300 }}>
+    //                 Your meals for the next week have been successfully booked.
+    //                 You can view your purchase history for details.
+    //             </Card>
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className={classes.buyBody}>

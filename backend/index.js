@@ -55,7 +55,7 @@ app.use(
         saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI,
-            ttl: 14 * 24 * 60 * 60, // 14 days
+            ttl: 4 * 24 * 60 * 60, // 14 days
             autoRemove: 'interval',
             autoRemoveInterval: 10 // Minutes
         }),
