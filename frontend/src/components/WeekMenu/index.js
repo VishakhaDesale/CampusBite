@@ -1,10 +1,6 @@
 import classes from './index.module.css';
 import { Table } from 'antd';
 
-// menu: the menu object
-// mobile: display menu as 7 individual tables for better mobile usability when true
-// highlight: when true, it looks for cells to be highlighted in the menu object for purchase history page
-// loading: plays a loading spinner when true
 export default function WeekMenu(props) {
     const menu = props.menu;
     const mobile = props.mobile;

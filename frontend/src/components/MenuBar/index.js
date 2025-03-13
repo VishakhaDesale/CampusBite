@@ -37,13 +37,11 @@ export default function MenuBar() {
     const [open, setopen] = useState(false);
     const [status, setStatus] = useState(false);
 
-    // console.log(status);
     // Fetch logged-in and admin status and render the menu accordingly
     useEffect(() => {
         const fetchData = async () => {
             try {
                 console.log("requesting status")
-                // const response = await axios.get(window.APIROOT + 'api/data/status', { withCredentials: true });
                 const response = await api.get('api/data/status');
 
                 console.log(response)
