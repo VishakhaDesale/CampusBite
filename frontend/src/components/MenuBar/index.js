@@ -104,13 +104,32 @@ export default function MenuBar() {
         }
     };
 
-    // Main navigation items
-    const mainNavItems = [
-        getItem('Home', '/', <HomeOutlined />, 'home'),
-        getItem('About Us', status?.loggedIn ? '/schedule#about' : '/#about', <InfoCircleOutlined />, 'about'),
-        getItem('Features', status?.loggedIn ? '/schedule#features' : '/#features', <AppstoreOutlined />, 'features'),
-        getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
-        getItem('Contact', status?.loggedIn ? '/schedule#contact' : '/#contact', <ContactsOutlined />, 'contact'),
+    // // Main navigation items
+    // const mainNavItems = [
+    //     getItem('Home', '/', <HomeOutlined />, 'home'),
+    //     getItem('About Us', status?.loggedIn ? '/schedule#about' : '/#about', <InfoCircleOutlined />, 'about'),
+    //     getItem('Features', status?.loggedIn ? '/schedule#features' : '/#features', <AppstoreOutlined />, 'features'),
+    //     getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
+    //     getItem('Contact', status?.loggedIn ? '/schedule#contact' : '/#contact', <ContactsOutlined />, 'contact'),
+    // ];
+    // Update mainNavItems in MenuBar component
+// const mainNavItems = [
+//     getItem('Home', '/', <HomeOutlined />, 'home'),
+//     getItem('About Us', '/#about', <InfoCircleOutlined />, 'about'), // Removed conditional path
+//     getItem('Features', '/#features', <AppstoreOutlined />, 'features'),
+//     getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
+//     getItem('Contact', '/#contact', <ContactsOutlined />, 'contact'), // Removed conditional path
+// ];
+const mainNavItems = status?.loggedIn 
+  ? [ // Only show these when logged IN
+      getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
+    ]
+  : [ // Show full menu when logged OUT
+      getItem('Home', '/', <HomeOutlined />, 'home'),
+      getItem('About Us', '/#about', <InfoCircleOutlined />, 'about'),
+      getItem('Features', '/#features', <AppstoreOutlined />, 'features'),
+      getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
+      getItem('Contact', '/#contact', <ContactsOutlined />, 'contact'),
     ];
 
     // Create login item separately so we can position it first
@@ -159,10 +178,20 @@ export default function MenuBar() {
     ];
 
     // If mobile, add main nav items to side menu
+    // const items = isMobile 
+    //     ? [...loginItem, { type: 'divider' }, ...mainNavItems, ...otherSideMenuItems] 
+    //     : [...loginItem, ...otherSideMenuItems]; 
     const items = isMobile 
-        ? [...loginItem, { type: 'divider' }, ...mainNavItems, ...otherSideMenuItems] 
-        : [...loginItem, ...otherSideMenuItems]; 
-
+    ? [
+        ...loginItem, 
+        { type: 'divider' },
+        ...(status?.loggedIn 
+          ? [] // Hide all except essential items when logged in
+          : mainNavItems
+        ),
+        ...otherSideMenuItems
+      ] 
+    : [...loginItem, ...otherSideMenuItems];
     // Feature mega menu items - enhanced with more details and icons
     const featureItems = [
         {
@@ -210,8 +239,9 @@ export default function MenuBar() {
     ];
 
     // Only show burger menu when user is logged in or not on homepage
-    const showBurgerMenu = status?.loggedIn || window.location.pathname !== '/';
-
+    // const showBurgerMenu = status?.loggedIn || window.location.pathname !== '/';
+// Update showBurgerMenu calculation in MenuBar
+const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname !== '/';
     // Handle click on vertical menu item
     const handleVerticalMenuClick = (link) => {
         navigate(link);
@@ -232,7 +262,7 @@ export default function MenuBar() {
                     onMouseEnter={() => setExpandedMenu(true)}
                     onMouseLeave={() => setExpandedMenu(false)}
                 >
-                    <div className={classes.verticalNavLogo}>
+                    {/* <div className={classes.verticalNavLogo}>
                         <Link to="/">
                             <motion.img 
                                 src="/assets/icon.png" 
@@ -252,7 +282,7 @@ export default function MenuBar() {
                                 </motion.span>
                             )}
                         </Link>
-                    </div>
+                    </div> */}
                     
                     <div className={classes.verticalNavItems}>
                         {verticalMenuItems.map((item) => (
@@ -327,23 +357,32 @@ export default function MenuBar() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.3 }}
             >
-                <div className={classes.logoContainer}>
-                    <Link to="/">
-                        <motion.img 
-                            src="/assets/icon.png" 
-                            alt="CampusBite Logo" 
-                            className={classes.logoImg}
-                            whileHover={{ rotate: 10, scale: 1.1 }}
-                            transition={{ duration: 0.2 }} 
-                        />
-                        <span className={classes.logoText}>
-                          Campus<span className={classes.biteText}>Bite</span>
-                        </span>
-                    </Link>
-                </div>
+                
+<div className={classes.logoContainer}>
+    <Link 
+        to="/" 
+        onClick={(e) => {
+            if (status?.loggedIn) {
+                e.preventDefault();
+            }
+        }}
+    >
+        <motion.img 
+            src="/assets/icon.png" 
+            alt="CampusBite Logo" 
+            className={classes.logoImg}
+            whileHover={{ rotate: 10, scale: 1.1 }}
+            transition={{ duration: 0.2 }} 
+        />
+        <span className={classes.logoText}>
+            Campus<span className={classes.biteText}>Bite</span>
+        </span>
+    </Link>
+</div>
+
                 
                 {/* Only show navbar on non-mobile screens */}
-                {!isMobile && (
+                {!isMobile && !status?.loggedIn && (
                     <nav className={classes.navbar}>
                         <ul>
                             <motion.li whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>

@@ -1,7 +1,7 @@
-import { Button, Spin, message, Tabs, Card, Badge } from 'antd';
+import { Spin, Card, message } from 'antd';
 import { useMediaQuery } from 'react-responsive';
 import { useState, useEffect } from "react";
-import { CheckCircleFilled, CalendarOutlined, RightOutlined, LeftOutlined } from '@ant-design/icons';
+import { CheckCircleFilled, CalendarOutlined } from '@ant-design/icons';
 import api from '../..';
 import styles from './index.module.css';
 
@@ -10,6 +10,19 @@ export default function PurchaseHistoryPage() {
   const [activeWeek, setActiveWeek] = useState("this");
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Define normalized day mapping
+  const dayMapping = {
+    "monday": "Monday",
+    "tuesday": "Tuesday", 
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    // Handle potential typo from API
+    "saturdayday": "Saturday"
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,24 +33,38 @@ export default function PurchaseHistoryPage() {
           api.get('api/user/data')
         ]);
 
-        const formattedData = menuResponse.data.map(r => ({
-          day: r.day,
-          breakfast: {
-            text: r.breakfast,
-            selected: buyerResponse.data[activeWeek][r.day].breakfast
-          },
-          lunch: {
-            text: r.lunch,
-            selected: buyerResponse.data[activeWeek][r.day].lunch
-          },
-          dinner: {
-            text: r.dinner,
-            selected: buyerResponse.data[activeWeek][r.day].dinner
-          }
-        }));
+        const buyerWeekData = buyerResponse.data?.[activeWeek] || {};
+
+        // Process menu data with normalized day names
+        const formattedData = menuResponse.data.map(r => {
+          // Normalize the day name to lowercase for consistent comparison
+          const normalizedDay = r.day.toLowerCase().replace('saturdayday', 'saturday');
+          
+          // Get buyer data using the normalized day name
+          const buyerDayData = buyerWeekData?.[normalizedDay] || 
+                               buyerWeekData?.[r.day] || {};
+          
+          return {
+            day: normalizedDay,
+            displayDay: dayMapping[normalizedDay] || normalizedDay,
+            breakfast: {
+              text: r.breakfast,
+              selected: buyerDayData.breakfast || false
+            },
+            lunch: {
+              text: r.lunch,
+              selected: buyerDayData.lunch || false
+            },
+            dinner: {
+              text: r.dinner,
+              selected: buyerDayData.dinner || false
+            }
+          };
+        });
 
         setMenu(formattedData);
       } catch (error) {
+        console.error("Fetch error:", error);
         message.error('Failed to fetch purchase history');
       } finally {
         setLoading(false);
@@ -47,11 +74,11 @@ export default function PurchaseHistoryPage() {
     fetchData();
   }, [activeWeek]);
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
   const mealTypes = ["breakfast", "lunch", "dinner"];
   const mealLabels = {
     breakfast: "Breakfast",
-    lunch: "Lunch", 
+    lunch: "Lunch",
     dinner: "Dinner"
   };
 
@@ -73,28 +100,9 @@ export default function PurchaseHistoryPage() {
           </span>
           Your Meal Plan
         </h1>
-        
-        <Badge count={getMealCount()} offset={[10, 0]}>
-          <div className={styles.weekToggleWrapper}>
-            <Button.Group className={styles.weekToggle}>
-              <Button 
-                type={activeWeek === "this" ? "primary" : "default"}
-                onClick={() => setActiveWeek("this")}
-                icon={<LeftOutlined />}
-                className={styles.weekToggleButton}
-              >
-                This Week
-              </Button>
-              <Button 
-                type={activeWeek === "next" ? "primary" : "default"} 
-                onClick={() => setActiveWeek("next")}
-                className={styles.weekToggleButton}
-              >
-                Next Week <RightOutlined />
-              </Button>
-            </Button.Group>
-          </div>
-        </Badge>
+        <div className={styles.mealStats}>
+          <span>Selected Meals: {getMealCount()}</span>
+        </div>
       </div>
 
       {loading ? (
@@ -104,19 +112,23 @@ export default function PurchaseHistoryPage() {
       ) : (
         <div className={styles.mealCardsContainer}>
           {days.map(day => {
-            const dayData = menu.find(d => d.day.toLowerCase() === day.toLowerCase());
-            if (!dayData) return null;
-            
+            // Find day data using normalized day name
+            const dayData = menu.find(d => d.day === day);
+            if (!dayData) {
+              console.log(`No data found for ${day}`);
+              return null;
+            }
+
             return (
-              <Card 
-                key={day} 
-                title={day} 
+              <Card
+                key={day}
+                title={dayData.displayDay || day.charAt(0).toUpperCase() + day.slice(1)}
                 className={styles.dayCard}
                 headStyle={{ backgroundColor: '#f7f7f7' }}
               >
                 {mealTypes.map(mealType => (
-                  <div 
-                    key={mealType} 
+                  <div
+                    key={mealType}
                     className={`${styles.mealItem} ${dayData[mealType].selected ? styles.selectedMeal : ''}`}
                   >
                     <div className={styles.mealHeader}>
@@ -125,7 +137,7 @@ export default function PurchaseHistoryPage() {
                       )}
                       <h3 className={styles.mealTitle}>{mealLabels[mealType]}</h3>
                     </div>
-                    <p className={styles.mealText}>{dayData[mealType].text}</p>
+                    <p className={styles.mealText}>{dayData[mealType].text || "No menu available"}</p>
                   </div>
                 ))}
               </Card>

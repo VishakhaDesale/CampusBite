@@ -206,15 +206,7 @@ export default function TotalMealsPage() {
                     }
                     extra={
                         <Space>
-                            <Tooltip title="Edit meals">
-                                <Button 
-                                    icon={<EditOutlined />} 
-                                    onClick={handleEditMeals}
-                                    disabled={loading}
-                                >
-                                    Edit
-                                </Button>
-                            </Tooltip>
+                            
                             <Tooltip title="Refresh data">
                                 <Button 
                                     icon={<ReloadOutlined />} 
@@ -231,50 +223,7 @@ export default function TotalMealsPage() {
                 </Card>
             )
         },
-        {
-            key: 'next',
-            label: (
-                <span>
-                    <CalendarOutlined /> Next Week
-                </span>
-            ),
-            children: (
-                <Card 
-                    className={classes.menuCard}
-                    title={
-                        <div className={classes.cardTitle}>
-                            <span className={classes.weekTitle}>
-                                <Badge status="warning" text="Next Week Menu" />
-                            </span>
-                        </div>
-                    }
-                    extra={
-                        <Space>
-                            <Tooltip title="Edit meals">
-                                <Button 
-                                    icon={<EditOutlined />} 
-                                    onClick={handleEditMeals}
-                                    disabled={loading}
-                                >
-                                    Edit
-                                </Button>
-                            </Tooltip>
-                            <Tooltip title="Refresh data">
-                                <Button 
-                                    icon={<ReloadOutlined />} 
-                                    onClick={() => fetchMenu("next")}
-                                    loading={loading && activeWeek === "next"}
-                                >
-                                    Refresh
-                                </Button>
-                            </Tooltip>
-                        </Space>
-                    }
-                >
-                    {renderContent('next')}
-                </Card>
-            )
-        }
+       
     ];
 
     return (

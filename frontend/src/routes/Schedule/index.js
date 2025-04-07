@@ -167,10 +167,7 @@ export default function SchedulePage() {
                                 </motion.div>
                             ))}
                         </div>
-                        <div className={classes.timingNote}>
-                            <InfoCircleOutlined style={{ marginRight: 8 }} />
-                            <Text type="secondary">Click on a meal to highlight it in the menu</Text>
-                        </div>
+                       
                     </motion.div>
                 ) : (
                     <Empty description="No timing information available" />

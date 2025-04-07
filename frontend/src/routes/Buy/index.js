@@ -16,7 +16,7 @@ const dayToNum = {
 };
 
 // Helper function to capitalize first letter
-const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 
 // Custom icon for meal types
 const MealIcon = ({ type }) => {
@@ -39,6 +39,11 @@ async function createOrder(selected) {
 }
 
 function MealCard({ dayData, selected, setSelected, loading }) {
+    // Add safety check to prevent rendering errors
+    if (!dayData || !dayData.day || !selected[dayData.day]) {
+        return null;
+    }
+
     const handleMealSelection = (meal, checked) => {
         setSelected(prev => ({
             ...prev,
@@ -94,14 +99,14 @@ function MealCard({ dayData, selected, setSelected, loading }) {
                                     </Text>
                                 </div>
                                 <Badge 
-                                    count={`₹${dayData[meal].cost}`} 
+                                    count={`₹${dayData[meal]?.cost || 0}`} 
                                     className={classes.priceBadge}
                                     style={{ backgroundColor: '#ff7f50' }}
                                 />
                             </div>
                             
                             <div className={classes.menuText}>
-                                {dayData[meal].text || <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Menu not available" />}
+                                {dayData[meal]?.text || <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Menu not available" />}
                             </div>
                             
                             <div className={classes.mealFooter}>
@@ -136,12 +141,11 @@ function OrderSummary({ selected, loading, cost, setBought, menu }) {
     const selectedMealsList = [];
     Object.entries(selected).forEach(([day, meals]) => {
         Object.entries(meals).forEach(([meal, isSelected]) => {
-            if (isSelected) {
-                const dayIndex = dayToNum[day];
+            if (isSelected && dayToNum[day] !== undefined && menu[dayToNum[day]] && menu[dayToNum[day]][meal]) {
                 selectedMealsList.push({
                     day: capitalize(day),
                     meal: capitalize(meal),
-                    cost: menu[dayIndex][meal].cost
+                    cost: menu[dayToNum[day]][meal].cost || 0
                 });
             }
         });
@@ -216,27 +220,44 @@ export default function BuyPage() {
     const [activeTab, setActiveTab] = useState('all');
     const isSmallScreen = useMediaQuery({ maxWidth: 768 });
     
-    const [menu, setMenu] = useState(Array(7).fill().map((_, i) => ({
-        day: Object.keys(dayToNum)[i],
-        breakfast: { text: "", cost: "" },
-        lunch: { text: "", cost: "" },
-        dinner: { text: "", cost: "" },
-    })));
-    
-    const [selected, setSelected] = useState(
-        Object.fromEntries(Object.keys(dayToNum).map(day => [
-            day, { breakfast: false, lunch: false, dinner: false }
-        ]))
-    );
+    const [menu, setMenu] = useState([]);
+    const [selected, setSelected] = useState({});
+
+    // Initialize menu and selected states
+    useEffect(() => {
+        // Initialize menu with empty data for all days
+        const initialMenu = Array(7).fill().map((_, i) => ({
+            day: Object.keys(dayToNum)[i],
+            breakfast: { text: "", cost: 0 },
+            lunch: { text: "", cost: 0 },
+            dinner: { text: "", cost: 0 },
+        }));
+
+        // Initialize selected state for all days
+        const initialSelected = Object.fromEntries(
+            Object.keys(dayToNum).map(day => [
+                day, { breakfast: false, lunch: false, dinner: false }
+            ])
+        );
+
+        setMenu(initialMenu);
+        setSelected(initialSelected);
+    }, []);
 
     // Calculate cost when selection changes
     useEffect(() => {
         const totalCost = Object.entries(selected).reduce((acc, [day, meals]) => {
-            const dayData = menu[dayToNum[day]];
-            return acc + Object.entries(meals).reduce((dayAcc, [meal, selected]) => {
-                return selected ? dayAcc + (dayData[meal]?.cost || 0) : dayAcc;
+            const dayIndex = dayToNum[day];
+            const dayData = menu[dayIndex];
+            
+            if (!dayData) return acc;
+            
+            return acc + Object.entries(meals).reduce((dayAcc, [meal, isSelected]) => {
+                if (!isSelected || !dayData[meal]) return dayAcc;
+                return dayAcc + (parseInt(dayData[meal].cost) || 0);
             }, 0);
         }, 0);
+        
         setCost(totalCost);
     }, [menu, selected]);
 
@@ -252,20 +273,47 @@ export default function BuyPage() {
                 const mealPrices = pricesRes.data.reduce((acc, { meal, cost }) => 
                     ({ ...acc, [meal]: cost }), {});
                 
-                const updatedMenu = menuRes.data.map(day => ({
-                    ...day,
-                    breakfast: { text: day.breakfast, cost: mealPrices.breakfast },
-                    lunch: { text: day.lunch, cost: mealPrices.lunch },
-                    dinner: { text: day.dinner, cost: mealPrices.dinner }
-                }));
+                // Process the menu data and handle "Saturdayday" typo
+                const processedMenuData = menuRes.data.map(day => {
+                    // Fix for "Saturdayday" typo
+                    const dayName = day.day === "Saturday" ? "saturday" : day.day.toLowerCase();
+                    
+                    return {
+                        ...day,
+                        day: dayName,
+                        breakfast: { text: day.breakfast, cost: mealPrices.breakfast || 0 },
+                        lunch: { text: day.lunch, cost: mealPrices.lunch || 0 },
+                        dinner: { text: day.dinner, cost: mealPrices.dinner || 0 }
+                    };
+                });
+                
+                // Create a new menu array with the correct structure
+                const updatedMenu = Array(7).fill().map((_, i) => {
+                    const dayName = Object.keys(dayToNum)[i];
+                    const dayData = processedMenuData.find(d => d.day === dayName);
+                    
+                    if (dayData) {
+                        return dayData;
+                    }
+                    
+                    // Return default data for missing days
+                    return {
+                        day: dayName,
+                        breakfast: { text: "", cost: mealPrices.breakfast || 0 },
+                        lunch: { text: "", cost: mealPrices.lunch || 0 },
+                        dinner: { text: "", cost: mealPrices.dinner || 0 }
+                    };
+                });
                 
                 setMenu(updatedMenu);
                 setLoading(false);
             } catch (error) {
+                console.error("Error fetching data:", error);
                 message.error('Failed to fetch data');
                 setLoading(false);
             }
         };
+        
         fetchData();
     }, []);
 
@@ -308,9 +356,9 @@ export default function BuyPage() {
     const getFilteredDays = () => {
         if (activeTab === 'all') return menu;
         if (activeTab === 'weekdays') 
-            return menu.filter(day => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(day.day));
+            return menu.filter(day => day && ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(day.day));
         if (activeTab === 'weekend') 
-            return menu.filter(day => ['saturday', 'sunday'].includes(day.day));
+            return menu.filter(day => day && ['saturday', 'sunday'].includes(day.day));
         return menu;
     };
 
@@ -334,7 +382,7 @@ export default function BuyPage() {
 
             <div className={classes.menuLayout}>
                 <div className={classes.menuContainer}>
-                    {getFilteredDays().map((dayData) => (
+                    {getFilteredDays().filter(dayData => dayData && dayData.day).map((dayData) => (
                         <MealCard 
                             key={dayData.day}
                             dayData={dayData}
