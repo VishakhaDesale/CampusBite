@@ -1,7 +1,7 @@
 import classes from "./index.module.css";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import {
     MenuOutlined,
@@ -17,21 +17,51 @@ import {
     HomeOutlined,
     InfoCircleOutlined,
     AppstoreOutlined,
-    ContactsOutlined
+    ContactsOutlined,
+    DownOutlined
 } from '@ant-design/icons';
 import { Menu, message } from 'antd';
 import api from "../..";
 
-const getItem = (label, link, icon, key) => ({
-    key,
-    icon,
-    label: <Link to={link}>{label}</Link>,
-});
+// Function to handle section navigation
+const handleSectionNavigation = (sectionId, navigate, setOpen) => {
+    // If already on homepage, just scroll to the section
+    if (window.location.pathname === '/') {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else {
+        // If not on homepage, navigate to homepage with section hash
+        navigate(`/#${sectionId}`);
+    }
+    
+    // Close mobile menu if it's open
+    setOpen(false);
+};
 
-const getLoginItem = (label, link, icon, key) => ({
+const getItem = (label, link, icon, key, navigate, setOpen) => {
+    // Special handling for section links
+    if (link.startsWith('/#')) {
+        const sectionId = link.substring(2); // Remove '/#' to get the section ID
+        return {
+            key,
+            icon,
+            label: <a onClick={() => handleSectionNavigation(sectionId, navigate, setOpen)}>{label}</a>,
+        };
+    }
+    // Regular navigation links
+    return {
+        key,
+        icon,
+        label: <Link to={link}>{label}</Link>,
+    };
+};
+
+const getLoginItem = (label, link, icon, key, handleSignInOut) => ({
     key,
     icon,
-    label: <a href={link}>{label}</a>,
+    label: <a href={link} onClick={handleSignInOut}>{label}</a>,
 });
 
 export default function MenuBar() {
@@ -43,6 +73,7 @@ export default function MenuBar() {
     const [expandedMenu, setExpandedMenu] = useState(false);
     const isMobile = useMediaQuery({ maxWidth: 768 });
     const navigate = useNavigate();
+    const location = useLocation();
     
     // Add scroll listener for transparent menu effect
     useEffect(() => {
@@ -104,33 +135,17 @@ export default function MenuBar() {
         }
     };
 
-    // // Main navigation items
-    // const mainNavItems = [
-    //     getItem('Home', '/', <HomeOutlined />, 'home'),
-    //     getItem('About Us', status?.loggedIn ? '/schedule#about' : '/#about', <InfoCircleOutlined />, 'about'),
-    //     getItem('Features', status?.loggedIn ? '/schedule#features' : '/#features', <AppstoreOutlined />, 'features'),
-    //     getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
-    //     getItem('Contact', status?.loggedIn ? '/schedule#contact' : '/#contact', <ContactsOutlined />, 'contact'),
-    // ];
-    // Update mainNavItems in MenuBar component
-// const mainNavItems = [
-//     getItem('Home', '/', <HomeOutlined />, 'home'),
-//     getItem('About Us', '/#about', <InfoCircleOutlined />, 'about'), // Removed conditional path
-//     getItem('Features', '/#features', <AppstoreOutlined />, 'features'),
-//     getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
-//     getItem('Contact', '/#contact', <ContactsOutlined />, 'contact'), // Removed conditional path
-// ];
-const mainNavItems = status?.loggedIn 
-  ? [ // Only show these when logged IN
-      getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
-    ]
-  : [ // Show full menu when logged OUT
-      getItem('Home', '/', <HomeOutlined />, 'home'),
-      getItem('About Us', '/#about', <InfoCircleOutlined />, 'about'),
-      getItem('Features', '/#features', <AppstoreOutlined />, 'features'),
-      getItem('Menu', '/schedule', <TableOutlined />, 'menu'),
-      getItem('Contact', '/#contact', <ContactsOutlined />, 'contact'),
-    ];
+    const mainNavItems = status?.loggedIn 
+      ? [ // Only show these when logged IN
+          getItem('Menu', '/schedule', <TableOutlined />, 'menu', navigate, setOpen),
+        ]
+      : [ // Show full menu when logged OUT
+          getItem('Home', '/#home', <HomeOutlined />, 'home', navigate, setOpen),
+          getItem('About Us', '/#about', <InfoCircleOutlined />, 'about', navigate, setOpen),
+          getItem('Features', '/#features', <AppstoreOutlined />, 'features', navigate, setOpen),
+          getItem('Menu', '/schedule', <TableOutlined />, 'menu', navigate, setOpen),
+          getItem('Contact', '/#contact', <ContactsOutlined />, 'contact', navigate, setOpen),
+        ];
 
     // Create login item separately so we can position it first
     const loginItem = window.location.pathname === '/' 
@@ -140,7 +155,8 @@ const mainNavItems = status?.loggedIn
             status?.loggedIn ? 'Sign out' : 'Sign in', 
             status?.loggedIn ? window.APIROOT + 'api/auth/signout' : window.APIROOT + 'api/auth/signin', 
             <UserOutlined />, 
-            '2'
+            '2',
+            handleSignInOut
         )
     ];
     
@@ -164,35 +180,47 @@ const mainNavItems = status?.loggedIn
     const otherSideMenuItems = [
         ...(status?.loggedIn ? [
             { type: 'divider' },
-            getItem('Schedule', '/schedule', <TableOutlined />, '3'),
-            getItem('Buy coupons', '/buy-coupons', <ShoppingCartOutlined />, '4'),
-            getItem('Purchase history', '/purchase-history', <CalendarOutlined />, '5'),
-            getItem('QR code', '/qr-code', <QrcodeOutlined />, '6'),
+            getItem('Schedule', '/schedule', <TableOutlined />, '3', navigate, setOpen),
+            getItem('Buy coupons', '/buy-coupons', <ShoppingCartOutlined />, '4', navigate, setOpen),
+            getItem('Purchase history', '/purchase-history', <CalendarOutlined />, '5', navigate, setOpen),
+            getItem('QR code', '/qr-code', <QrcodeOutlined />, '6', navigate, setOpen),
             ...(status?.admin ? [
                 { type: 'divider' },
-                getItem('Admin panel', '/admin', <SettingOutlined />, '7'),
-                getItem('Total meals', '/total-meals', <SolutionOutlined />, '8'),
-                getItem('Scan QR code', '/scan-qr', <ScanOutlined />, '9'),
+                getItem('Admin panel', '/admin', <SettingOutlined />, '7', navigate, setOpen),
+                getItem('Total meals', '/total-meals', <SolutionOutlined />, '8', navigate, setOpen),
+                getItem('Scan QR code', '/scan-qr', <ScanOutlined />, '9', navigate, setOpen),
             ] : []),
         ] : [])
     ];
 
-    // If mobile, add main nav items to side menu
-    // const items = isMobile 
-    //     ? [...loginItem, { type: 'divider' }, ...mainNavItems, ...otherSideMenuItems] 
-    //     : [...loginItem, ...otherSideMenuItems]; 
-    const items = isMobile 
-    ? [
-        ...loginItem, 
+    // Mobile menu items - ensure they include all navigation links
+    const mobileMenuItems = [
+        getLoginItem(
+            status?.loggedIn ? 'Sign out' : 'Sign in', 
+            status?.loggedIn ? window.APIROOT + 'api/auth/signout' : window.APIROOT + 'api/auth/signin', 
+            <UserOutlined />, 
+            'mobile-signin',
+            handleSignInOut
+        ),
         { type: 'divider' },
         ...(status?.loggedIn 
           ? [] // Hide all except essential items when logged in
-          : mainNavItems
+          : [
+              getItem('Home', '/#home', <HomeOutlined />, 'mobile-home', navigate, setOpen),
+              getItem('About Us', '/#about', <InfoCircleOutlined />, 'mobile-about', navigate, setOpen),
+              getItem('Features', '/#features', <AppstoreOutlined />, 'mobile-features', navigate, setOpen),
+              getItem('Menu', '/schedule', <TableOutlined />, 'mobile-menu', navigate, setOpen),
+              getItem('Contact', '/#contact', <ContactsOutlined />, 'mobile-contact', navigate, setOpen),
+            ]
         ),
         ...otherSideMenuItems
-      ] 
+    ];
+    
+    const items = isMobile 
+    ? mobileMenuItems 
     : [...loginItem, ...otherSideMenuItems];
-    // Feature mega menu items - enhanced with more details and icons
+    
+    // Feature mega menu items - updated to remove Dietary Preferences and Campus Delivery
     const featureItems = [
         {
             title: "Weekly Menu",
@@ -221,27 +249,11 @@ const mainNavItems = status?.loggedIn
             frontDescription: "Plan your meals ahead of time",
             backDescription: "Schedule your meals for the week and get personalized nutrition information",
             color: "#AB47BC"
-        },
-        {
-            title: "Dietary Preferences",
-            icon: "fas fa-leaf",
-            frontDescription: "Personalized meal options",
-            backDescription: "Filter menu items based on your dietary preferences and restrictions",
-            color: "#26A69A"
-        },
-        {
-            title: "Campus Delivery",
-            icon: "fas fa-bicycle",
-            frontDescription: "Get meals delivered on campus",
-            backDescription: "Convenient delivery service to your location within the campus premises",
-            color: "#FFA726"
         }
     ];
 
-    // Only show burger menu when user is logged in or not on homepage
-    // const showBurgerMenu = status?.loggedIn || window.location.pathname !== '/';
-// Update showBurgerMenu calculation in MenuBar
-const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname !== '/';
+    const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname !== '/';
+    
     // Handle click on vertical menu item
     const handleVerticalMenuClick = (link) => {
         navigate(link);
@@ -262,28 +274,6 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                     onMouseEnter={() => setExpandedMenu(true)}
                     onMouseLeave={() => setExpandedMenu(false)}
                 >
-                    {/* <div className={classes.verticalNavLogo}>
-                        <Link to="/">
-                            <motion.img 
-                                src="/assets/icon.png" 
-                                alt="CampusBite Logo" 
-                                className={classes.verticalLogoImg}
-                                whileHover={{ rotate: 10, scale: 1.1 }}
-                                transition={{ duration: 0.2 }} 
-                            />
-                            {expandedMenu && (
-                                <motion.span 
-                                    className={classes.verticalLogoText}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    Campus<span className={classes.biteText}>Bite</span>
-                                </motion.span>
-                            )}
-                        </Link>
-                    </div> */}
-                    
                     <div className={classes.verticalNavItems}>
                         {verticalMenuItems.map((item) => (
                             <motion.div
@@ -358,27 +348,27 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                 transition={{ duration: 0.3 }}
             >
                 
-<div className={classes.logoContainer}>
-    <Link 
-        to="/" 
-        onClick={(e) => {
-            if (status?.loggedIn) {
-                e.preventDefault();
-            }
-        }}
-    >
-        <motion.img 
-            src="/assets/icon.png" 
-            alt="CampusBite Logo" 
-            className={classes.logoImg}
-            whileHover={{ rotate: 10, scale: 1.1 }}
-            transition={{ duration: 0.2 }} 
-        />
-        <span className={classes.logoText}>
-            Campus<span className={classes.biteText}>Bite</span>
-        </span>
-    </Link>
-</div>
+                <div className={classes.logoContainer}>
+                    <Link 
+                        to="/" 
+                        onClick={(e) => {
+                            if (status?.loggedIn) {
+                                e.preventDefault();
+                            }
+                        }}
+                    >
+                        <motion.img 
+                            src="/assets/icon.png" 
+                            alt="CampusBite Logo" 
+                            className={classes.logoImg}
+                            whileHover={{ rotate: 10, scale: 1.1 }}
+                            transition={{ duration: 0.2 }} 
+                        />
+                        <span className={classes.logoText}>
+                            Campus<span className={classes.biteText}>Bite</span>
+                        </span>
+                    </Link>
+                </div>
 
                 
                 {/* Only show navbar on non-mobile screens */}
@@ -386,10 +376,10 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                     <nav className={classes.navbar}>
                         <ul>
                             <motion.li whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
-                                <Link to="/">Home</Link>
+                                <a onClick={() => handleSectionNavigation('home', navigate, setOpen)}>Home</a>
                             </motion.li>
                             <motion.li whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
-                                <Link to={status?.loggedIn ? "/schedule#about" : "/#about"}>About Us</Link>
+                                <a onClick={() => handleSectionNavigation('about', navigate, setOpen)}>About Us</a>
                             </motion.li>
                             <div 
                                 className={classes.featuresContainer}
@@ -401,14 +391,17 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                                     transition={{ duration: 0.2 }}
                                     className={classes.featuresMenuItem}
                                 >
-                                    <Link to={status?.loggedIn ? "/schedule#features" : "/#features"}>Features</Link>
+                                    <a onClick={() => handleSectionNavigation('features', navigate, setOpen)} className={classes.featureMenuLink}>
+                                        Features
+                                        <DownOutlined className={classes.menuArrowIcon} />
+                                    </a>
                                 </motion.li>
                             </div>
                             <motion.li whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
                                 <Link to="/schedule">Menu</Link>
                             </motion.li>
                             <motion.li whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
-                                <Link to={status?.loggedIn ? "/schedule#contact" : "/#contact"}>Contact</Link>
+                                <a onClick={() => handleSectionNavigation('contact', navigate, setOpen)}>Contact</a>
                             </motion.li>
                         </ul>
                     </nav>
@@ -515,8 +508,8 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                                                         transition={{ duration: 0.6, ease: "easeInOut" }}
                                                     >
                                                         <p style={{ marginBottom: "1rem" }}>{feature.backDescription}</p>
-                                                        <Link 
-                                                            to={status?.loggedIn ? "/schedule#features" : "/#features"} 
+                                                        <a 
+                                                            onClick={() => handleSectionNavigation('features', navigate, setOpen)}
                                                             className={classes.learnMoreLink}
                                                             style={{
                                                                 color: "#fff",
@@ -525,11 +518,12 @@ const showBurgerMenu = isMobile || status?.loggedIn || window.location.pathname 
                                                                 border: "2px solid #fff",
                                                                 textDecoration: "none",
                                                                 fontWeight: "bold",
-                                                                transition: "all 0.3s ease"
+                                                                transition: "all 0.3s ease",
+                                                                cursor: "pointer"
                                                             }}
                                                         >
                                                             Learn More
-                                                        </Link>
+                                                        </a>
                                                     </motion.div>
                                                 </div>
                                             </motion.div>

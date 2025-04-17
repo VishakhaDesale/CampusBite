@@ -1,8 +1,22 @@
 import classes from './index.module.css';
 import { Button } from 'antd';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
+    // Add this state and function to handle sign-in
+    const [status, setStatus] = useState(false);
+
+    // Handle sign-in the same way as in MenuBar
+    const handleSignIn = (e) => {
+        e.preventDefault();
+        try {
+            window.location.href = window.APIROOT + 'api/auth/signin';
+        } catch (error) {
+            console.error('Failed to redirect to sign in');
+        }
+    };
+
     return (
         <div className={classes.container}>
             {/* Hero Section */}
@@ -20,11 +34,14 @@ export default function HomePage() {
                                 Explore Menu
                             </Button>
                         </Link>
-                        <Link to="/signup">
-                            <Button size="large" className={classes.secondaryBtn}>
-                                Join Now
-                            </Button>
-                        </Link>
+                        {/* Update Join Now button to use the same sign-in handler */}
+                        <Button 
+                            size="large" 
+                            className={classes.secondaryBtn}
+                            onClick={handleSignIn}
+                        >
+                            Join Now
+                        </Button>
                     </div>
                     <div className={classes.statRow}>
                         <div className={classes.stat}>
@@ -100,15 +117,11 @@ export default function HomePage() {
                             </div>
                         </div>
                         <Link to="/about">
-                            <Button type="primary" size="large" className={`${classes.primaryBtn} ${classes.aboutBtn}`}>
-                                Our Full Story
-                            </Button>
+                           
                         </Link>
                     </div>
                 </div>
             </section>
-
-           
 
             {/* Contact Section */}
             <section className={classes.contact} id="contact">

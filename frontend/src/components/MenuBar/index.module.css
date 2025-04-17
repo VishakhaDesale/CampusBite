@@ -169,8 +169,73 @@
     gap: 2rem;
 }
 
-.featureCardContainer {
-    perspective: 1000px;
+/* Adding styles for the dropdown indicator in the Features menu */
+.featureMenuLink {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+}
+
+.menuArrowIcon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.featuresMenuItem:hover .menuArrowIcon {
+    transform: rotate(180deg);
+}
+
+/* Update feature cards grid to arrange in 2x2 layout */
+.featureCardsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Adjust for smaller screens */
+@media (max-width: 768px) {
+    .featureCardsGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* Add styles to make the dropdown indicator more visible */
+.featuresMenuItem {
+    position: relative;
+}
+
+
+.featuresMenuItem:hover::after,
+.featuresContainer:hover .featuresMenuItem::after {
+    width: 30px;
+}
+
+/* Add a subtle animation for the features menu */
+.featuresContainer {
+    position: relative;
+}
+
+/* Pulse animation for the arrow indicator on first hover */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.featuresMenuItem:hover .menuArrowIcon {
+    animation: pulse 1s ease-in-out;
 }
 
 .featureCard {
