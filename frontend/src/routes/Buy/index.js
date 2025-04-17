@@ -181,13 +181,20 @@ function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchas
 
     const handlePayment = async () => {
         try {
-            await createOrder(selected);
+            // Create combinedSelected by merging alreadyPurchased and selected
+            const combinedSelected = {};
+            Object.keys(selected).forEach(day => {
+                combinedSelected[day] = {};
+                ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+                    // Include meal if it's already purchased or newly selected
+                    combinedSelected[day][meal] = alreadyPurchased[day]?.[meal] || selected[day][meal];
+                });
+            });
+            await createOrder(combinedSelected);
             message.success("Order created successfully!");
             setBought(true);
-            
-            // Update the already purchased meals in local state
-            // This ensures immediate UI update without needing a page refresh
-            window.location.reload(); // Simple solution to refresh the page and reload purchased data
+            window.location.href = '/buy-coupons';  
+            // window.location.replace('/buy-coupons')
         } catch (error) {
             message.error("Failed to create order");
         }
