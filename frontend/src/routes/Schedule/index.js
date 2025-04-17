@@ -105,21 +105,27 @@ export default function SchedulePage() {
         return dayMenu[activeDay];
     };
 
-    // Get all available days from menu data
+    // Get all available days from menu data in the correct order
     const getDays = () => {
         if (menu.length === 0) return [];
         
+        // Define the correct order of days (Monday to Sunday)
+        const orderedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        
         // Get all keys except "key" to find day names
-        const allDays = [];
+        const availableDays = [];
         menu.forEach(item => {
             Object.keys(item).forEach(key => {
-                if (key !== 'key' && !allDays.includes(key)) {
-                    allDays.push(key);
+                if (key !== 'key' && !availableDays.includes(key)) {
+                    availableDays.push(key);
                 }
             });
         });
         
-        return allDays;
+        // Sort the available days according to the defined order
+        return availableDays.sort((a, b) => {
+            return orderedDays.indexOf(a) - orderedDays.indexOf(b);
+        });
     };
 
     // Highlight meal when user clicks on a meal timing
@@ -167,7 +173,6 @@ export default function SchedulePage() {
                                 </motion.div>
                             ))}
                         </div>
-                       
                     </motion.div>
                 ) : (
                     <Empty description="No timing information available" />
@@ -234,6 +239,7 @@ export default function SchedulePage() {
                             mobile={mobile} 
                             activeDay={activeDay}
                             highlightedMeal={highlightedMeal}
+                            getDays={getDays}  // Pass the getDays function to WeekMenu
                         />
                     </motion.div>
                 </AnimatePresence>

@@ -46,6 +46,11 @@ export default function AdminPanel() {
   const [savingMenu, setSavingMenu] = useState(false);
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [editingCell, setEditingCell] = useState({ day: null, meal: null });
+  // Add new state for menu edit value
+  const [editMenuValue, setEditMenuValue] = useState('');
+  
+  // Define the correct day order
+  const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   
   // Handle editing for Time & Cost section
   const startEditingTime = (record) => {
@@ -89,7 +94,9 @@ export default function AdminPanel() {
 
   // Handle editing for Menu section
   const startEditingMenu = (day, mealType) => {
+    const dayData = menuData.find(item => item.day === day);
     setEditingCell({ day, meal: mealType });
+    setEditMenuValue(dayData[mealType]);
   };
 
   const saveMenuEdit = async (day, mealType, value) => {
@@ -318,8 +325,9 @@ export default function AdminPanel() {
                   <div className={styles.editActions}>
                     <Input
                       autoFocus
-                      defaultValue={mealValue}
-                      onPressEnter={(e) => saveMenuEdit(day, mealType, e.target.value)}
+                      value={editMenuValue}
+                      onChange={(e) => setEditMenuValue(e.target.value)}
+                      onPressEnter={() => saveMenuEdit(day, mealType, editMenuValue)}
                       className={styles.mealInput}
                     />
                     <Space>
@@ -327,10 +335,7 @@ export default function AdminPanel() {
                         type="primary"
                         size="small"
                         icon={<CheckOutlined />}
-                        onClick={(e) => {
-                          const inputValue = e.target.parentNode.parentNode.previousSibling.value;
-                          saveMenuEdit(day, mealType, inputValue);
-                        }}
+                        onClick={() => saveMenuEdit(day, mealType, editMenuValue)}
                       />
                       <Button
                         danger
@@ -357,6 +362,21 @@ export default function AdminPanel() {
         })}
       </Card>
     );
+  };
+
+  // Sort the menuData according to the day order
+  const getSortedMenuData = () => {
+    if (!menuData.length) return [];
+    
+    // Create a copy of the menu data for sorting
+    const sortedData = [...menuData];
+    
+    // Sort based on the day order array
+    sortedData.sort((a, b) => {
+      return dayOrder.indexOf(a.day.toLowerCase()) - dayOrder.indexOf(b.day.toLowerCase());
+    });
+    
+    return sortedData;
   };
 
   return (
@@ -397,7 +417,7 @@ export default function AdminPanel() {
               </div>
             ) : (
               <div className={styles.menuGrid}>
-                {menuData.map(item => renderDayMenu(item.day))}
+                {getSortedMenuData().map(item => renderDayMenu(item.day))}
               </div>
             )}
           </motion.div>

@@ -238,7 +238,31 @@
     color: #52c41a;
     font-size: 24px;
   }
-  
+  /* Add these CSS classes to your index.module.css file */
+
+.purchasedMeal {
+  position: relative;
+  opacity: 0.85;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  cursor: not-allowed !important;
+}
+
+.purchasedBadge {
+  margin-left: 8px;
+}
+
+.alreadyPurchased {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #52c41a;
+}
+
+.purchasedText {
+  color: #52c41a;
+  font-weight: 500;
+}
   /* Responsive adjustments */
   @media (max-width: 992px) {
     .menuLayout {

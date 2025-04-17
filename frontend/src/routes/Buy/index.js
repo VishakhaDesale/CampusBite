@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Button, message, Card, Checkbox, Badge, Spin, Typography, Tabs, Tooltip, Empty } from 'antd';
-import { ShoppingCartOutlined, CheckCircleOutlined, InfoCircleOutlined, CalendarOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, CheckCircleOutlined, InfoCircleOutlined, CalendarOutlined, LockOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
 import api from '../..';
@@ -38,13 +37,18 @@ async function createOrder(selected) {
     }
 }
 
-function MealCard({ dayData, selected, setSelected, loading }) {
+function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased }) {
     // Add safety check to prevent rendering errors
     if (!dayData || !dayData.day || !selected[dayData.day]) {
         return null;
     }
 
     const handleMealSelection = (meal, checked) => {
+        // If meal is already purchased, prevent selection
+        if (alreadyPurchased[dayData.day]?.[meal]) {
+            return;
+        }
+        
         setSelected(prev => ({
             ...prev,
             [dayData.day]: {
@@ -77,7 +81,10 @@ function MealCard({ dayData, selected, setSelected, loading }) {
             bodyStyle={{ padding: '12px' }}
         >
             <Spin spinning={loading}>
-                {['breakfast', 'lunch', 'dinner'].map(meal => (
+                {['breakfast', 'lunch', 'dinner'].map(meal => {
+                    const isPurchased = alreadyPurchased[dayData.day]?.[meal];
+                    
+                    return (
                     <motion.div 
                         key={meal}
                         initial={{ opacity: 0 }}
@@ -85,9 +92,11 @@ function MealCard({ dayData, selected, setSelected, loading }) {
                         transition={{ duration: 0.3, delay: ['breakfast', 'lunch', 'dinner'].indexOf(meal) * 0.1 }}
                     >
                         <Card 
-                            className={`${classes.mealItem} ${selected[dayData.day][meal] ? classes.selectedMeal : ''}`}
+                            className={`${classes.mealItem} 
+                                      ${selected[dayData.day][meal] ? classes.selectedMeal : ''} 
+                                      ${isPurchased ? classes.purchasedMeal : ''}`}
                             size="small"
-                            hoverable
+                            hoverable={!isPurchased}
                             onClick={() => handleMealSelection(meal, !selected[dayData.day][meal])}
                         >
                             <div className={classes.mealHeader}>
@@ -97,11 +106,18 @@ function MealCard({ dayData, selected, setSelected, loading }) {
                                     <Text type="secondary" className={classes.mealTime}>
                                         {getMealTime(meal)}
                                     </Text>
+                                    {isPurchased && (
+                                        <Badge 
+                                            count={<LockOutlined style={{ color: '#fff' }} />}
+                                            style={{ backgroundColor: '#52c41a' }}
+                                            className={classes.purchasedBadge}
+                                        />
+                                    )}
                                 </div>
                                 <Badge 
                                     count={`₹${dayData[meal]?.cost || 0}`} 
                                     className={classes.priceBadge}
-                                    style={{ backgroundColor: '#ff7f50' }}
+                                    style={{ backgroundColor: isPurchased ? '#7cb305' : '#ff7f50' }}
                                 />
                             </div>
                             
@@ -110,31 +126,43 @@ function MealCard({ dayData, selected, setSelected, loading }) {
                             </div>
                             
                             <div className={classes.mealFooter}>
-                                <Checkbox 
-                                    checked={selected[dayData.day][meal]}
-                                    onChange={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleMealSelection(meal, !selected[dayData.day][meal]);
-                                    }}
-                                    className={classes.mealCheckbox}
-                                >
-                                    Select
-                                </Checkbox>
+                                {isPurchased ? (
+                                    <div className={classes.alreadyPurchased}>
+                                        <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                                        <Text className={classes.purchasedText}>Already Purchased</Text>
+                                    </div>
+                                ) : (
+                                    <Checkbox 
+                                        checked={selected[dayData.day][meal]}
+                                        onChange={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleMealSelection(meal, !selected[dayData.day][meal]);
+                                        }}
+                                        className={classes.mealCheckbox}
+                                        disabled={isPurchased}
+                                    >
+                                        Select
+                                    </Checkbox>
+                                )}
                                 
-                                <Tooltip title="Click to select this meal">
-                                    <InfoCircleOutlined className={classes.infoIcon} />
+                                <Tooltip title={isPurchased ? "Already purchased" : "Click to select this meal"}>
+                                    {isPurchased ? 
+                                        <CheckCircleOutlined className={classes.infoIcon} style={{ color: '#52c41a' }} /> : 
+                                        <InfoCircleOutlined className={classes.infoIcon} />
+                                    }
                                 </Tooltip>
                             </div>
                         </Card>
                     </motion.div>
-                ))}
+                    );
+                })}
             </Spin>
         </Card>
     );
 }
 
-function OrderSummary({ selected, loading, cost, setBought, menu }) {
+function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchased }) {
     const totalMeals = Object.values(selected).reduce((acc, dayMeals) => 
         acc + Object.values(dayMeals).filter(Boolean).length, 0);
     
@@ -156,6 +184,10 @@ function OrderSummary({ selected, loading, cost, setBought, menu }) {
             await createOrder(selected);
             message.success("Order created successfully!");
             setBought(true);
+            
+            // Update the already purchased meals in local state
+            // This ensures immediate UI update without needing a page refresh
+            window.location.reload(); // Simple solution to refresh the page and reload purchased data
         } catch (error) {
             message.error("Failed to create order");
         }
@@ -222,6 +254,8 @@ export default function BuyPage() {
     
     const [menu, setMenu] = useState([]);
     const [selected, setSelected] = useState({});
+    // New state to track already purchased meals
+    const [alreadyPurchased, setAlreadyPurchased] = useState({});
 
     // Initialize menu and selected states
     useEffect(() => {
@@ -317,40 +351,55 @@ export default function BuyPage() {
         fetchData();
     }, []);
 
-    // Check existing orders
+    // Check existing orders and fetch already purchased meals
     useEffect(() => {
-        api.get('api/user/boughtNextWeek')
-            .then(({ data }) => setBought(data))
-            .catch(() => message.error('Failed to check existing orders'));
+        Promise.all([
+            api.get('api/user/boughtNextWeek'),
+            api.get('api/user/data') // Get already purchased meals data
+        ])
+        .then(([boughtRes, userData]) => {
+            setBought(boughtRes.data);
+            
+            // Process user data to get already purchased meals
+            const thisWeekData = userData.data?.this || {};
+            
+            // Create a normalized structure for already purchased meals
+            const purchasedMeals = {};
+            
+            Object.entries(thisWeekData).forEach(([day, meals]) => {
+                // Normalize day name (handle potential typos)
+                const normalizedDay = day.toLowerCase().replace('saturdayday', 'saturday');
+                
+                purchasedMeals[normalizedDay] = {
+                    breakfast: !!meals.breakfast,
+                    lunch: !!meals.lunch,
+                    dinner: !!meals.dinner
+                };
+            });
+            
+            setAlreadyPurchased(purchasedMeals);
+            
+            // Remove already purchased meals from selection
+            setSelected(prev => {
+                const newSelected = { ...prev };
+                
+                Object.entries(purchasedMeals).forEach(([day, meals]) => {
+                    if (newSelected[day]) {
+                        Object.entries(meals).forEach(([meal, isPurchased]) => {
+                            if (isPurchased) {
+                                newSelected[day][meal] = false;
+                            }
+                        });
+                    }
+                });
+                
+                return newSelected;
+            });
+        })
+        .catch(() => {
+            message.error('Failed to check existing orders');
+        });
     }, []);
-
-    // if (bought) {
-    //     return (
-    //         <div className={classes.orderConfirmedContainer}>
-    //             <motion.div
-    //                 initial={{ scale: 0.8, opacity: 0 }}
-    //                 animate={{ scale: 1, opacity: 1 }}
-    //                 transition={{ duration: 0.5 }}
-    //             >
-    //                 <Card 
-    //                     className={classes.orderConfirmedCard}
-    //                     title={
-    //                         <div className={classes.confirmationHeader}>
-    //                             <CheckCircleOutlined className={classes.confirmIcon} />
-    //                             <span>Order Confirmed</span>
-    //                         </div>
-    //                     }
-    //                 >
-    //                     <Typography.Paragraph>
-    //                         Your meals for the next week have been successfully booked.
-    //                         You can view your purchase history for details.
-    //                     </Typography.Paragraph>
-    //                     <Button type="primary">View History</Button>
-    //                 </Card>
-    //             </motion.div>
-    //         </div>
-    //     );
-    // }
 
     // Filter days based on active tab
     const getFilteredDays = () => {
@@ -389,6 +438,7 @@ export default function BuyPage() {
                             selected={selected}
                             setSelected={setSelected}
                             loading={loading}
+                            alreadyPurchased={alreadyPurchased} // Pass already purchased meals
                         />
                     ))}
                 </div>
@@ -400,6 +450,7 @@ export default function BuyPage() {
                         cost={cost}
                         setBought={setBought}
                         menu={menu}
+                        alreadyPurchased={alreadyPurchased} // Pass already purchased meals
                     />
                 </div>
             </div>
