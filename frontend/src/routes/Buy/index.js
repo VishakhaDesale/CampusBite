@@ -5,13 +5,14 @@ import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
 import api from '../..';
 import classes from './index.module.css';
+import UPIPayment from '../../components/UPI';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
-const dayToNum = { 
-    "monday": 0, "tuesday": 1, "wednesday": 2, 
-    "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6 
+const dayToNum = {
+    "monday": 0, "tuesday": 1, "wednesday": 2,
+    "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6
 };
 
 // Helper function to capitalize first letter
@@ -19,15 +20,15 @@ const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '
 
 // Custom icon for meal types
 const MealIcon = ({ type }) => {
-  const icons = {
-    breakfast: '🍳',
-    lunch: '🍲',
-    dinner: '🍽️'
-  };
-  return <span className={classes.mealIcon}>{icons[type]}</span>;
+    const icons = {
+        breakfast: '🍳',
+        lunch: '🍲',
+        dinner: '🍽️'
+    };
+    return <span className={classes.mealIcon}>{icons[type]}</span>;
 };
 
-async function createOrder(selected) {
+export async function createOrder(selected) {
     try {
         const response = await api.post('api/user/createOrder', { selected });
         return response.data;
@@ -48,7 +49,7 @@ function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased })
         if (alreadyPurchased[dayData.day]?.[meal]) {
             return;
         }
-        
+
         setSelected(prev => ({
             ...prev,
             [dayData.day]: {
@@ -83,7 +84,7 @@ function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased })
             <Spin spinning={loading}>
                 {['breakfast', 'lunch', 'dinner'].map(meal => {
                     const isPurchased = alreadyPurchased[dayData.day]?.[meal];
-                    
+
                     return (
                     <motion.div 
                         key={meal}
@@ -120,16 +121,16 @@ function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased })
                                     style={{ backgroundColor: isPurchased ? '#7cb305' : '#ff7f50' }}
                                 />
                             </div>
-                            
+
                             <div className={classes.menuText}>
                                 {dayData[meal]?.text || <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Menu not available" />}
                             </div>
-                            
+
                             <div className={classes.mealFooter}>
                                 {isPurchased ? (
                                     <div className={classes.alreadyPurchased}>
                                         <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                                        <Text className={classes.purchasedText}>Already Purchased</Text>
+                                        <Text className={classes.purchasedText}>Already Purchased </Text>
                                     </div>
                                 ) : (
                                     <Checkbox 
@@ -145,7 +146,7 @@ function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased })
                                         Select
                                     </Checkbox>
                                 )}
-                                
+
                                 <Tooltip title={isPurchased ? "Already purchased" : "Click to select this meal"}>
                                     {isPurchased ? 
                                         <CheckCircleOutlined className={classes.infoIcon} style={{ color: '#52c41a' }} /> : 
@@ -160,12 +161,91 @@ function MealCard({ dayData, selected, setSelected, loading, alreadyPurchased })
             </Spin>
         </Card>
     );
+
+
+    // return (
+    //     <Card
+    //         className={classes.dayCard}
+    //         bordered={true}
+    //         title={
+    //             <div className={classes.dayHeader}>
+    //                 <CalendarOutlined className={classes.calendarIcon} />
+    //                 <span>{capitalize(dayData.day)}</span>
+    //             </div>
+    //         }
+    //         headStyle={{ backgroundColor: '#f9f9f9' }}
+    //         bodyStyle={{ padding: '12px' }}
+    //     >
+    //         <Spin spinning={loading}>
+    //             {['breakfast', 'lunch', 'dinner'].map(meal => {
+    //                 const isPurchased = alreadyPurchased[dayData.day]?.[meal];
+
+    //                 // Hide the meal card if purchased
+    //                 if (isPurchased) {
+    //                     return null;
+    //                 }
+
+    //                 return (
+    //                     <motion.div
+    //                         key={meal}
+    //                         initial={{ opacity: 0 }}
+    //                         animate={{ opacity: 1 }}
+    //                         transition={{ duration: 0.3, delay: ['breakfast', 'lunch', 'dinner'].indexOf(meal) * 0.1 }}
+    //                     >
+    //                         <Card
+    //                             className={`${classes.mealItem} ${selected[dayData.day][meal] ? classes.selectedMeal : ''}`}
+    //                             size="small"
+    //                             hoverable
+    //                             onClick={() => handleMealSelection(meal, !selected[dayData.day][meal])}
+    //                         >
+    //                             <div className={classes.mealHeader}>
+    //                                 <div className={classes.mealTitleBlock}>
+    //                                     <MealIcon type={meal} />
+    //                                     <Text strong className={classes.mealType}>{capitalize(meal)}</Text>
+    //                                     <Text type="secondary" className={classes.mealTime}>
+    //                                         {getMealTime(meal)}
+    //                                     </Text>
+    //                                 </div>
+    //                                 <Badge
+    //                                     count={`₹${dayData[meal]?.cost || 0}`}
+    //                                     className={classes.priceBadge}
+    //                                     style={{ backgroundColor: '#ff7f50' }}
+    //                                 />
+    //                             </div>
+
+    //                             <div className={classes.menuText}>
+    //                                 {dayData[meal]?.text || <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Menu not available" />}
+    //                             </div>
+
+    //                             <div className={classes.mealFooter}>
+    //                                 <Checkbox
+    //                                     checked={selected[dayData.day][meal]}
+    //                                     onChange={(e) => e.stopPropagation()}
+    //                                     onClick={(e) => {
+    //                                         e.stopPropagation();
+    //                                         handleMealSelection(meal, !selected[dayData.day][meal]);
+    //                                     }}
+    //                                     className={classes.mealCheckbox}
+    //                                 >
+    //                                     Select
+    //                                 </Checkbox>
+    //                                 <Tooltip title="Click to select this meal">
+    //                                     <InfoCircleOutlined className={classes.infoIcon} />
+    //                                 </Tooltip>
+    //                             </div>
+    //                         </Card>
+    //                     </motion.div>
+    //                 );
+    //             })}
+    //         </Spin>
+    //     </Card>
+    // );
 }
 
 function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchased }) {
-    const totalMeals = Object.values(selected).reduce((acc, dayMeals) => 
+    const totalMeals = Object.values(selected).reduce((acc, dayMeals) =>
         acc + Object.values(dayMeals).filter(Boolean).length, 0);
-    
+
     const selectedMealsList = [];
     Object.entries(selected).forEach(([day, meals]) => {
         Object.entries(meals).forEach(([meal, isSelected]) => {
@@ -179,7 +259,31 @@ function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchas
         });
     });
 
+    // const handlePayment = async () => {
+    //     try {
+    //         // Create combinedSelected by merging alreadyPurchased and selected
+    //         const combinedSelected = {};
+    //         Object.keys(selected).forEach(day => {
+    //             combinedSelected[day] = {};
+    //             ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+    //                 // Include meal if it's already purchased or newly selected
+    //                 combinedSelected[day][meal] = alreadyPurchased[day]?.[meal] || selected[day][meal];
+    //             });
+    //         });
+    //         <UPIPayment/>
+    //         await createOrder(combinedSelected);
+    //         message.success("Order created successfully!");
+    //         setBought(true);
+    //         window.location.href = '/buy-coupons';  
+    //         // window.location.replace('/buy-coupons')
+    //     } catch (error) {
+    //         message.error("Failed to create order");
+    //     }
+    // };
+
+    const [TotalLocal, setTotalLocal] = useState();
     const handlePayment = async () => {
+
         try {
             // Create combinedSelected by merging alreadyPurchased and selected
             const combinedSelected = {};
@@ -190,23 +294,27 @@ function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchas
                     combinedSelected[day][meal] = alreadyPurchased[day]?.[meal] || selected[day][meal];
                 });
             });
-            await createOrder(combinedSelected);
-            message.success("Order created successfully!");
-            setBought(true);
-            window.location.href = '/buy-coupons';  
-            // window.location.replace('/buy-coupons')
+            // Store the combined selection in localStorage
+            localStorage.setItem('pendingOrder', JSON.stringify(combinedSelected));
+            localStorage.setItem('cost', JSON.stringify(TotalLocal));
+            // Navigate to the UPI payment page
+            window.location.href = '/upi-payment';
         } catch (error) {
-            message.error("Failed to create order");
+            message.error("Failed to initiate payment");
         }
     };
+
+    useEffect(() => {
+        setTotalLocal(cost);
+    }, [cost]);
 
     return (
         <Card className={classes.summaryCard}>
             <div className={classes.summaryHeader}>
                 <Title level={4}>Order Summary</Title>
-                <Badge 
-                    count={totalMeals} 
-                    showZero 
+                <Badge
+                    count={totalMeals}
+                    showZero
                     overflowCount={99}
                     style={{ backgroundColor: totalMeals ? '#52c41a' : '#d9d9d9' }}
                 >
@@ -223,9 +331,9 @@ function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchas
                         </div>
                     ))
                 ) : (
-                    <Empty 
-                        image={Empty.PRESENTED_IMAGE_SIMPLE} 
-                        description="No meals selected yet" 
+                    <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description="No meals selected yet"
                         className={classes.emptySelection}
                     />
                 )}
@@ -236,13 +344,13 @@ function OrderSummary({ selected, loading, cost, setBought, menu, alreadyPurchas
                     <Text strong>Total Cost:</Text>
                     <Title level={3} className={classes.costAmount}>₹{cost}</Title>
                 </div>
-                
-                <Button 
-                    disabled={loading || !cost} 
-                    onClick={handlePayment} 
-                    className={classes.buyButton} 
-                    type="primary" 
-                    size="large" 
+
+                <Button
+                    disabled={loading || !cost}
+                    onClick={handlePayment}
+                    className={classes.buyButton}
+                    type="primary"
+                    size="large"
                     icon={<ShoppingCartOutlined />}
                 >
                     Confirm Order
@@ -258,7 +366,7 @@ export default function BuyPage() {
     const [bought, setBought] = useState(false);
     const [activeTab, setActiveTab] = useState('all');
     const isSmallScreen = useMediaQuery({ maxWidth: 768 });
-    
+
     const [menu, setMenu] = useState([]);
     const [selected, setSelected] = useState({});
     // New state to track already purchased meals
@@ -290,15 +398,15 @@ export default function BuyPage() {
         const totalCost = Object.entries(selected).reduce((acc, [day, meals]) => {
             const dayIndex = dayToNum[day];
             const dayData = menu[dayIndex];
-            
+
             if (!dayData) return acc;
-            
+
             return acc + Object.entries(meals).reduce((dayAcc, [meal, isSelected]) => {
                 if (!isSelected || !dayData[meal]) return dayAcc;
                 return dayAcc + (parseInt(dayData[meal].cost) || 0);
             }, 0);
         }, 0);
-        
+
         setCost(totalCost);
     }, [menu, selected]);
 
@@ -310,15 +418,15 @@ export default function BuyPage() {
                     api.get('api/data/menu'),
                     api.get('api/data/time')
                 ]);
-                
-                const mealPrices = pricesRes.data.reduce((acc, { meal, cost }) => 
+
+                const mealPrices = pricesRes.data.reduce((acc, { meal, cost }) =>
                     ({ ...acc, [meal]: cost }), {});
-                
+
                 // Process the menu data and handle "Saturdayday" typo
                 const processedMenuData = menuRes.data.map(day => {
                     // Fix for "Saturdayday" typo
                     const dayName = day.day === "Saturday" ? "saturday" : day.day.toLowerCase();
-                    
+
                     return {
                         ...day,
                         day: dayName,
@@ -327,16 +435,16 @@ export default function BuyPage() {
                         dinner: { text: day.dinner, cost: mealPrices.dinner || 0 }
                     };
                 });
-                
+
                 // Create a new menu array with the correct structure
                 const updatedMenu = Array(7).fill().map((_, i) => {
                     const dayName = Object.keys(dayToNum)[i];
                     const dayData = processedMenuData.find(d => d.day === dayName);
-                    
+
                     if (dayData) {
                         return dayData;
                     }
-                    
+
                     // Return default data for missing days
                     return {
                         day: dayName,
@@ -345,7 +453,7 @@ export default function BuyPage() {
                         dinner: { text: "", cost: mealPrices.dinner || 0 }
                     };
                 });
-                
+
                 setMenu(updatedMenu);
                 setLoading(false);
             } catch (error) {
@@ -354,7 +462,7 @@ export default function BuyPage() {
                 setLoading(false);
             }
         };
-        
+
         fetchData();
     }, []);
 
@@ -364,56 +472,56 @@ export default function BuyPage() {
             api.get('api/user/boughtNextWeek'),
             api.get('api/user/data') // Get already purchased meals data
         ])
-        .then(([boughtRes, userData]) => {
-            setBought(boughtRes.data);
-            
-            // Process user data to get already purchased meals
-            const thisWeekData = userData.data?.this || {};
-            
-            // Create a normalized structure for already purchased meals
-            const purchasedMeals = {};
-            
-            Object.entries(thisWeekData).forEach(([day, meals]) => {
-                // Normalize day name (handle potential typos)
-                const normalizedDay = day.toLowerCase().replace('saturdayday', 'saturday');
-                
-                purchasedMeals[normalizedDay] = {
-                    breakfast: !!meals.breakfast,
-                    lunch: !!meals.lunch,
-                    dinner: !!meals.dinner
-                };
-            });
-            
-            setAlreadyPurchased(purchasedMeals);
-            
-            // Remove already purchased meals from selection
-            setSelected(prev => {
-                const newSelected = { ...prev };
-                
-                Object.entries(purchasedMeals).forEach(([day, meals]) => {
-                    if (newSelected[day]) {
-                        Object.entries(meals).forEach(([meal, isPurchased]) => {
-                            if (isPurchased) {
-                                newSelected[day][meal] = false;
-                            }
-                        });
-                    }
+            .then(([boughtRes, userData]) => {
+                setBought(boughtRes.data);
+
+                // Process user data to get already purchased meals
+                const thisWeekData = userData.data?.this || {};
+
+                // Create a normalized structure for already purchased meals
+                const purchasedMeals = {};
+
+                Object.entries(thisWeekData).forEach(([day, meals]) => {
+                    // Normalize day name (handle potential typos)
+                    const normalizedDay = day.toLowerCase().replace('saturdayday', 'saturday');
+
+                    purchasedMeals[normalizedDay] = {
+                        breakfast: !!meals.breakfast,
+                        lunch: !!meals.lunch,
+                        dinner: !!meals.dinner
+                    };
                 });
-                
-                return newSelected;
+
+                setAlreadyPurchased(purchasedMeals);
+
+                // Remove already purchased meals from selection
+                setSelected(prev => {
+                    const newSelected = { ...prev };
+
+                    Object.entries(purchasedMeals).forEach(([day, meals]) => {
+                        if (newSelected[day]) {
+                            Object.entries(meals).forEach(([meal, isPurchased]) => {
+                                if (isPurchased) {
+                                    newSelected[day][meal] = false;
+                                }
+                            });
+                        }
+                    });
+
+                    return newSelected;
+                });
+            })
+            .catch(() => {
+                message.error('Failed to check existing orders');
             });
-        })
-        .catch(() => {
-            message.error('Failed to check existing orders');
-        });
     }, []);
 
     // Filter days based on active tab
     const getFilteredDays = () => {
         if (activeTab === 'all') return menu;
-        if (activeTab === 'weekdays') 
+        if (activeTab === 'weekdays')
             return menu.filter(day => day && ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(day.day));
-        if (activeTab === 'weekend') 
+        if (activeTab === 'weekend')
             return menu.filter(day => day && ['saturday', 'sunday'].includes(day.day));
         return menu;
     };
@@ -425,8 +533,8 @@ export default function BuyPage() {
                 <Text type="secondary">Choose your meals for the upcoming week</Text>
             </div>
 
-            <Tabs 
-                activeKey={activeTab} 
+            <Tabs
+                activeKey={activeTab}
                 onChange={setActiveTab}
                 className={classes.menuTabs}
                 type="card"
@@ -439,7 +547,7 @@ export default function BuyPage() {
             <div className={classes.menuLayout}>
                 <div className={classes.menuContainer}>
                     {getFilteredDays().filter(dayData => dayData && dayData.day).map((dayData) => (
-                        <MealCard 
+                        <MealCard
                             key={dayData.day}
                             dayData={dayData}
                             selected={selected}
@@ -449,9 +557,9 @@ export default function BuyPage() {
                         />
                     ))}
                 </div>
-                
+
                 <div className={classes.orderSummaryContainer}>
-                    <OrderSummary 
+                    <OrderSummary
                         selected={selected}
                         loading={loading}
                         cost={cost}
