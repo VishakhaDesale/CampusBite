@@ -511,18 +511,18 @@ export default function MenuBar() {
                                                         <a 
                                                             onClick={() => handleSectionNavigation('features', navigate, setOpen)}
                                                             className={classes.learnMoreLink}
-                                                            style={{
-                                                                color: "#fff",
-                                                                padding: "0.5rem 1rem",
-                                                                borderRadius: "4px",
-                                                                border: "2px solid #fff",
-                                                                textDecoration: "none",
-                                                                fontWeight: "bold",
-                                                                transition: "all 0.3s ease",
-                                                                cursor: "pointer"
-                                                            }}
+                                                            // style={{
+                                                            //     color: "#fff",
+                                                            //     padding: "0.5rem 1rem",
+                                                            //     borderRadius: "4px",
+                                                            //     border: "2px solid #fff",
+                                                            //     textDecoration: "none",
+                                                            //     fontWeight: "bold",
+                                                            //     transition: "all 0.3s ease",
+                                                            //     cursor: "pointer"
+                                                            // }}
                                                         >
-                                                            Learn More
+                                                            {/* Learn More */}
                                                         </a>
                                                     </motion.div>
                                                 </div>
