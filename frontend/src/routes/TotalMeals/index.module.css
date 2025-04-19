@@ -45,49 +45,6 @@
     margin-top: 8px;
 }
 
-.statsContainer {
-    margin-top: 24px;
-}
-
-.statCard {
-    margin-bottom: 16px;
-    text-align: center;
-    border-radius: 8px;
-}
-
-.statCard .ant-statistic-title {
-    font-size: 14px;
-    color: #595959;
-}
-
-.statCard .ant-statistic-content {
-    font-size: 24px;
-    color: #262626;
-}
-
-.distributionCard {
-    margin-top: 16px;
-    border-radius: 8px;
-}
-
-.progressContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.progressItem {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.progressItem span {
-    width: 80px;
-    font-size: 14px;
-    color: #595959;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .pageContainer {
@@ -103,17 +60,7 @@
         align-items: flex-start;
         gap: 8px;
     }
-
-    .progressItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .progressItem span {
-        width: auto;
-    }
-}/* Global Styles */
+}
 
 /* Container Styles */
 .pageContainer {
@@ -179,64 +126,6 @@
     margin-top: 8px;
 }
 
-/* Stats Container Styles */
-.statsContainer {
-    margin-top: 24px;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* Stat Card Styles */
-.statCard {
-    margin-bottom: 16px;
-    text-align: center;
-    border-radius: 8px;
-    padding: 16px;
-}
-
-.statCard .ant-statistic-title {
-    font-size: 14px;
-    color: #595959;
-    font-weight: 500;
-}
-
-.statCard .ant-statistic-content {
-    font-size: 24px;
-    color: #262626;
-    font-weight: 600;
-}
-
-/* Distribution Card Styles */
-.distributionCard {
-    margin-top: 16px;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* Progress Container Styles */
-.progressContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-}
-
-/* Progress Item Styles */
-.progressItem {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.progressItem span {
-    width: 80px;
-    font-size: 14px;
-    color: #595959;
-    font-weight: 500;
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .pageContainer {
@@ -251,15 +140,5 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-    }
-
-    .progressItem {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .progressItem span {
-        width: auto;
     }
 }
