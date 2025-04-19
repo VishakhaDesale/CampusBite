@@ -7,7 +7,8 @@ const UPIPayment = () => {
   const [cost, setCost] = useState(false);
   const hasProcessed = useRef(false); // 🚨 Guard to prevent multiple runs
 
-  const upiLink = "upi://pay?pa=nageshyalparatte@okaxis&pn=Nagesh+Yalparatte&am=1&cu=INR";
+  const upiLink = process.env.REACT_APP_UPILINK;
+  const linkLast = "&cu=INR";
 
   useEffect(() => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -53,7 +54,7 @@ const UPIPayment = () => {
         <>
           <h2>Scan to Pay {cost}</h2>
           <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiLink)}&size=200x200`}
+            src={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiLink+cost+linkLast)}&size=200x200`}
             alt="Scan QR to Pay"
             style={{ margin: "10rem 0", width: "200px" }}
           />
