@@ -132,11 +132,11 @@ export default function HomePage() {
                 <div className={classes.contactInfo}>
                     <div className={classes.contactItem}>
                         <i className="fas fa-map-marker-alt"></i>
-                        <p>Campus Center, Building 4</p>
+                        <p>Indira College Of Engineering And Management , Parandwadi, Pune</p>
                     </div>
                     <div className={classes.contactItem}>
                         <i className="fas fa-clock"></i>
-                        <p>Open: Mon-Fri, 7:30 AM - 8:00 PM</p>
+                        <p>Open: Mon-Fri, 7:30 AM - 9:00 PM</p>
                     </div>
                 </div>
             </section>
