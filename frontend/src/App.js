@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Layout } from 'antd';
 
 // Utilities
@@ -19,8 +19,11 @@ import AdminPanel from './routes/AdminPanel';
 import TotalMealsPage from './routes/TotalMeals';
 import ScanQRPage from './routes/ScanQR';
 
+
+
 // To check if user is logged in
 import api from '.';
+import UPIPayment from './components/UPI';
 
 export default function App() {
     // Removes the loader after the site has been fully loaded
@@ -31,6 +34,7 @@ export default function App() {
     const [loading, setLoading] = useState(true);
     const [justLoggedIn, setJustLoggedIn] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -56,8 +60,12 @@ export default function App() {
 
     // Handle redirect after login
     useEffect(() => {
+        console.log("Herre"+window.location.href);
         if (justLoggedIn && isAuthenticated) {
-            navigate('/schedule');
+            if(!(window.location.href === "http://localhost:3000/upi-payment")){ 
+                navigate('/schedule');
+            }
+              
             setJustLoggedIn(false); // Reset the flag after redirect
         }
     }, [justLoggedIn, isAuthenticated, navigate]);
@@ -95,6 +103,11 @@ export default function App() {
                         <Route path="/buy-coupons" element={
                             <ProtectedRoute>
                                 <BuyPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/upi-payment" element={
+                            <ProtectedRoute>
+                                <UPIPayment />
                             </ProtectedRoute>
                         } />
                                               

@@ -23,6 +23,7 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log("MongoDB connected"))
 .catch(err => console.log("MongoDB connection error: ", err));
+mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 30000 }); // 30 seconds
 
 
 // Passport config
@@ -55,12 +56,12 @@ app.use(
         saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI,
-            ttl: 4 * 24 * 60 * 60, // 14 days
+            ttl: 1 * 24 * 60 * 60, // 
             autoRemove: 'interval',
             autoRemoveInterval: 10 // Minutes
         }),
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24, // 1 day session duration
+            maxAge: 1000 * 60 * 60 , // 1 day session duration
             secure: false, // Use `true` for HTTPS
             httpOnly: true,
             sameSite: 'lax',
@@ -90,12 +91,12 @@ app.use(passport.session());
 
 
 // Debugging middleware
-app.use((req, res, next) => {
-    console.log('Session ID:', req.sessionID);
-    console.log('Authenticated:', req.isAuthenticated());
-    console.log('User:', req.user);
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log('Session ID:', req.sessionID);
+//     console.log('Authenticated:', req.isAuthenticated());
+//     console.log('User:', req.user);
+//     next();
+// });
 
 
 
