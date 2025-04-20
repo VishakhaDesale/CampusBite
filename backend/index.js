@@ -56,12 +56,12 @@ app.use(
         saveUninitialized: false,
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI,
-            ttl: 1 * 24 * 60 * 60, // 14 days
+            ttl: 1 * 24 * 60 * 60, // 
             autoRemove: 'interval',
             autoRemoveInterval: 10 // Minutes
         }),
         cookie: {
-            maxAge: 1000 * 60 * 60 * 24, // 1 day session duration
+            maxAge: 1000 * 60 * 60 , // 1 day session duration
             secure: false, // Use `true` for HTTPS
             httpOnly: true,
             sameSite: 'lax',
