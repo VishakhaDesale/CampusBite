@@ -76,7 +76,7 @@ Built to modernize campus mess systems, CampusBite provides a web-based solution
 | Database      | MongoDB                                |
 | Authentication| Google OAuth 2.0                  |
 | Payment       | Razorpay API                           |
-| Others        | QR Code Library, Chart.js, Cloudinary   |
+| Others        | QR Code Library, Chart.js, PowerBI  |
 
 ---
 
