@@ -58,10 +58,12 @@ Built to modernize campus mess systems, CampusBite provides a web-based solution
 ## 📸 Screenshots
 
 ![screenshot (5)](https://github.com/user-attachments/assets/d9bc020b-9bc2-4404-8df2-47afeeaa27b9)
-![Screenshot (379)](https://github.com/user-attachments/assets/bccf8906-1891-40ea-b456-66b1d0f553e2)
-![image](https://github.com/user-attachments/assets/17382825-fb69-4ee2-92aa-1ad1daca3852)
-![image](https://github.com/user-attachments/assets/2fb01559-9530-4f11-9527-a17a423d3166)
+![Screenshot (391)](https://github.com/user-attachments/assets/598d1194-4db6-4ad2-932d-35d32efe59a7)
+![Screenshot (393)](https://github.com/user-attachments/assets/719343ac-a10c-4164-8753-eeccdf9b896f)
 ![Screenshot (389)](https://github.com/user-attachments/assets/6f4ca1e5-c6d4-4abd-a0cb-8ad9335a923c)
+![Screenshot (394)](https://github.com/user-attachments/assets/a1243150-30d0-4b01-a8e4-18c2373237f6)
+![Screenshot (392)](https://github.com/user-attachments/assets/8f78aced-7c61-4d87-954e-eb1eb1ef64e7)
+![image](https://github.com/user-attachments/assets/c24d2543-f34a-4ff1-aa8f-b2651d260e05)
 
 ---
 
